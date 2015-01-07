@@ -1,0 +1,51 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>com.aol.dmp</groupId>
+  <artifactId>disruptor_avro_writer</artifactId>
+  <version>0.1.0</version>
+  <description>Disruptor-based Avro file writer</description>
+  <packaging>jar</packaging>
+
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <java.version>1.7</java.version>
+  </properties>
+  
+  <distributionManagement>
+    <repository>
+      <id>aol-advertising-releases</id>
+      <name>AOL Releases</name>
+      <url>http://cmmaven.cm.aol.com:8081/nexus/content/repositories/aol-advertising/</url>
+    </repository>
+    <snapshotRepository>
+      <id>aol-advertising-snapshots</id>
+      <name>AOL: Snapshots</name>
+      <url>http://cmmaven.cm.aol.com:8081/nexus/content/repositories/aol-advertising-snaps/</url>
+    </snapshotRepository>
+  </distributionManagement>
+  
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>3.2</version>
+        <configuration>
+          <source>${java.version}</source>
+          <target>${java.version}</target>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+
+  <dependencies>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>4.11</version>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+</project>
