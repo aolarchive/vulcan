@@ -2,8 +2,11 @@ package com.aol.advertising.dmp.disruptor.api.factory;
 
 import java.io.File;
 
+import org.apache.avro.Schema;
+
 import com.aol.advertising.dmp.disruptor.DisruptorAvroFileWriter;
 import com.aol.advertising.dmp.disruptor.api.builder.DisruptorAvroFileWriterBuilder;
+import com.aol.advertising.dmp.disruptor.rolling.RollingPolicy;
 import com.lmax.disruptor.WaitStrategy;
 import com.lmax.disruptor.dsl.ProducerType;
 
@@ -14,18 +17,25 @@ import com.lmax.disruptor.dsl.ProducerType;
  */
 public class DisruptorAvroFileWriterFactory {
 
-  public static DisruptorAvroFileWriter createNewWriterWithDefaults(final File avroFilename) throws IllegalArgumentException {
-    return DisruptorAvroFileWriterBuilder.createNewWriter().thatWritesTo(avroFilename).build();
+  public static DisruptorAvroFileWriter createNewWriterWithDefaults(final File avroFileName,
+                                                                    final Schema avroSchema) throws IllegalArgumentException {
+    return DisruptorAvroFileWriterBuilder.createNewWriter().thatWritesTo(avroFileName)
+                                                           .thatWritesRecordsWith(avroSchema)
+                                                           .build();
   }
   
-  public static DisruptorAvroFileWriter createNewWriter(final File avroFilename,
+  public static DisruptorAvroFileWriter createNewWriter(final File avroFileName,
+                                                        final Schema avroSchema,
                                                         int ringBufferSize,
                                                         final ProducerType producerType,
-                                                        final WaitStrategy waitStrategy) throws IllegalArgumentException {
-    return DisruptorAvroFileWriterBuilder.createNewWriter().thatWritesTo(avroFilename)
+                                                        final WaitStrategy waitStrategy,
+                                                        final RollingPolicy rollingPolicy) throws IllegalArgumentException {
+    return DisruptorAvroFileWriterBuilder.createNewWriter().thatWritesTo(avroFileName)
+                                                           .thatWritesRecordsWith(avroSchema)
                                                            .withARingBufferOfSize(ringBufferSize)
                                                            .withAProducerOfType(producerType)
                                                            .withWaitStrategy(waitStrategy)
+                                                           .withRollingPolicy(rollingPolicy)
                                                            .build();
   }
 

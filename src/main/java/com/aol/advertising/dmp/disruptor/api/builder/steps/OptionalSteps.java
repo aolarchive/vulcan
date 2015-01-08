@@ -1,6 +1,8 @@
-package com.aol.advertising.dmp.disruptor.api.builder;
+package com.aol.advertising.dmp.disruptor.api.builder.steps;
 
 import com.aol.advertising.dmp.disruptor.DisruptorAvroFileWriter;
+import com.aol.advertising.dmp.disruptor.rolling.RollingPolicy;
+import com.aol.advertising.dmp.disruptor.rolling.TimeAndSizeBasedRollingPolicy;
 import com.lmax.disruptor.SleepingWaitStrategy;
 import com.lmax.disruptor.WaitStrategy;
 import com.lmax.disruptor.dsl.ProducerType;
@@ -35,7 +37,14 @@ public interface OptionalSteps {
   OptionalSteps withWaitStrategy(final WaitStrategy waitStrategy);
 
   /**
-   * Finish configuration and create a new {@link DisruptorAvroFileWriter} object
+   * Rolling policy for the destination Avro file
+   * <p>
+   * Default is {@link TimeAndSizeBasedRollingPolicy} with a maximum file size of 50MB
+   */
+  OptionalSteps withRollingPolicy(final RollingPolicy rollingPolicy);
+
+  /**
+   * Finish configuration and create a new {@link DisruptorAvroFileWriter} instance
    */
   DisruptorAvroFileWriter build();
 
