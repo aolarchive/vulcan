@@ -3,12 +3,10 @@ package com.aol.advertising.dmp.disruptor.api.builder;
 import java.io.File;
 import java.util.concurrent.Executors;
 
-import org.apache.avro.specific.SpecificRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.aol.advertising.dmp.disruptor.DisruptorAvroFileWriter;
-import com.aol.advertising.dmp.disruptor.ringbuffer.BufferEvent;
 import com.aol.advertising.dmp.disruptor.ringbuffer.BufferEventFactory;
 import com.lmax.disruptor.SleepingWaitStrategy;
 import com.lmax.disruptor.WaitStrategy;
@@ -16,29 +14,18 @@ import com.lmax.disruptor.dsl.Disruptor;
 import com.lmax.disruptor.dsl.ProducerType;
 
 /**
- * Fluent builder API
+ * Fluent builder API to create new instances of {@link DisruptorAvroFileWriter}. This API is
+ * suitable for standalone applications with no dependency injection and for programmatic
+ * configuration styles such as Spring's Java-based configuration.
+ * <p>
+ * See:
+ * <ul>
+ * <li><a href="http://en.wikipedia.org/wiki/Fluent_interface">Fluent API</li>
+ * <li><a href="http://rdafbn.blogspot.com/2012/07/step-builder-pattern_28.html">Step builder
+ * pattern</li>
+ * </ul>
  */
 public class DisruptorAvroFileWriterBuilder implements MandatorySteps, OptionalSteps {
-
-  private static class DisruptorAvroFileWriterImp implements DisruptorAvroFileWriter {
-
-    private Disruptor<BufferEvent> disruptor;
-
-    private DisruptorAvroFileWriterImp() {
-    }
-
-    @Override
-    public void write(final SpecificRecord avroRecord) {
-    }
-
-    @Override
-    public void close() {
-      //cerrar executor con awaitTermination
-      //hacer flush
-      //cerrar disruptor evitando publishes en el ringbuffer con un flag volatil
-    }
-
-  }
 
   private static final Logger log = LoggerFactory.getLogger(DisruptorAvroFileWriterBuilder.class);
   private static final BufferEventFactory bufferEventFactory = new BufferEventFactory();
@@ -54,6 +41,9 @@ public class DisruptorAvroFileWriterBuilder implements MandatorySteps, OptionalS
     writerUnderConstruction = new DisruptorAvroFileWriterImp();
   }
 
+  /**
+   * Start creating a {@link DisruptorAvroFileWriter}
+   */
   public static MandatorySteps createNewWriter() {
     final DisruptorAvroFileWriterBuilder newBuilder = new DisruptorAvroFileWriterBuilder();
     newBuilder.useSensibleDefaults();
@@ -92,7 +82,7 @@ public class DisruptorAvroFileWriterBuilder implements MandatorySteps, OptionalS
   }
 
   @Override
-  public OptionalSteps withADisruptorSuitableForAProducerOfType(final ProducerType producerType) {
+  public OptionalSteps withAProducerOfType(final ProducerType producerType) {
     if (producerType != null) {
       this.producerType = producerType;
     } else {
@@ -102,7 +92,7 @@ public class DisruptorAvroFileWriterBuilder implements MandatorySteps, OptionalS
   }
 
   @Override
-  public OptionalSteps withAnAvroWriterThatWaitsForNewEventsWithStrategy(final WaitStrategy waitStrategy) {
+  public OptionalSteps withWaitStrategy(final WaitStrategy waitStrategy) {
     if (waitStrategy != null) {
       this.waitStrategy = waitStrategy;
     } else {

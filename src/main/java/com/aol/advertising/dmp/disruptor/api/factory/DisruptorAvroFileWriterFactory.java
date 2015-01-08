@@ -8,7 +8,9 @@ import com.lmax.disruptor.WaitStrategy;
 import com.lmax.disruptor.dsl.ProducerType;
 
 /**
- * Factory API
+ * Factory API to create new instances of {@link DisruptorAvroFileWriter}. This API is suitable for
+ * applications with dependency injection and declarative configuration styles such as Spring's
+ * XML-based configuration.
  */
 public class DisruptorAvroFileWriterFactory {
 
@@ -22,8 +24,8 @@ public class DisruptorAvroFileWriterFactory {
                                                         final WaitStrategy waitStrategy) throws IllegalArgumentException {
     return DisruptorAvroFileWriterBuilder.createNewWriter().thatWritesTo(avroFilename)
                                                            .withARingBufferOfSize(ringBufferSize)
-                                                           .withADisruptorSuitableForAProducerOfType(producerType)
-                                                           .withAnAvroWriterThatWaitsForNewEventsWithStrategy(waitStrategy)
+                                                           .withAProducerOfType(producerType)
+                                                           .withWaitStrategy(waitStrategy)
                                                            .build();
   }
 
