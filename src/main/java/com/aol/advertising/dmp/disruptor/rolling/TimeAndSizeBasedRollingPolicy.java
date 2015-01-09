@@ -4,6 +4,8 @@ import java.io.File;
 
 import org.apache.avro.specific.SpecificRecord;
 
+import com.aol.advertising.dmp.disruptor.api.rolling.RollingPolicy;
+
 public class TimeAndSizeBasedRollingPolicy implements RollingPolicy {
 
   private final int rolloverTriggeringSizeInMB;

@@ -1,4 +1,4 @@
-package com.aol.advertising.dmp.disruptor;
+package com.aol.advertising.dmp.disruptor.api;
 
 import org.apache.avro.specific.SpecificRecord;
 

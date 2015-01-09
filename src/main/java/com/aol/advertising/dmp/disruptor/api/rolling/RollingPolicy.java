@@ -1,4 +1,4 @@
-package com.aol.advertising.dmp.disruptor.rolling;
+package com.aol.advertising.dmp.disruptor.api.rolling;
 
 import java.io.File;
 

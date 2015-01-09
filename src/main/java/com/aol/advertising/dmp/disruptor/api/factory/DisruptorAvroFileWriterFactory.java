@@ -4,9 +4,9 @@ import java.io.File;
 
 import org.apache.avro.Schema;
 
-import com.aol.advertising.dmp.disruptor.DisruptorAvroFileWriter;
+import com.aol.advertising.dmp.disruptor.api.DisruptorAvroFileWriter;
 import com.aol.advertising.dmp.disruptor.api.builder.DisruptorAvroFileWriterBuilder;
-import com.aol.advertising.dmp.disruptor.rolling.RollingPolicy;
+import com.aol.advertising.dmp.disruptor.api.rolling.RollingPolicy;
 import com.lmax.disruptor.WaitStrategy;
 import com.lmax.disruptor.dsl.ProducerType;
 
@@ -17,26 +17,46 @@ import com.lmax.disruptor.dsl.ProducerType;
  */
 public class DisruptorAvroFileWriterFactory {
 
-  public static DisruptorAvroFileWriter createNewWriterWithDefaults(final File avroFileName,
-                                                                    final Schema avroSchema) throws IllegalArgumentException {
-    return DisruptorAvroFileWriterBuilder.createNewWriter().thatWritesTo(avroFileName)
-                                                           .thatWritesRecordsWith(avroSchema)
-                                                           .build();
-  }
+  private File avroFileName;
+  private Schema avroSchema;
+  private int ringBufferSize;
+  private ProducerType producerType;
+  private WaitStrategy waitStrategy;
+  private RollingPolicy rollingPolicy;
   
-  public static DisruptorAvroFileWriter createNewWriter(final File avroFileName,
-                                                        final Schema avroSchema,
-                                                        int ringBufferSize,
-                                                        final ProducerType producerType,
-                                                        final WaitStrategy waitStrategy,
-                                                        final RollingPolicy rollingPolicy) throws IllegalArgumentException {
+  public DisruptorAvroFileWriter createNewWriter() throws IllegalArgumentException {
     return DisruptorAvroFileWriterBuilder.createNewWriter().thatWritesTo(avroFileName)
-                                                           .thatWritesRecordsWith(avroSchema)
-                                                           .withARingBufferOfSize(ringBufferSize)
-                                                           .withAProducerOfType(producerType)
+                                                           .thatWritesRecordsOf(avroSchema)
+                                                           .withRingBufferSize(ringBufferSize)
+                                                           .withProducerType(producerType)
                                                            .withWaitStrategy(waitStrategy)
                                                            .withRollingPolicy(rollingPolicy)
                                                            .build();
+  }
+
+
+  public void setAvroFileName(File avroFileName) {
+    this.avroFileName = avroFileName;
+  }
+
+  public void setAvroSchema(Schema avroSchema) {
+    this.avroSchema = avroSchema;
+  }
+
+  public void setRingBufferSize(int ringBufferSize) {
+    this.ringBufferSize = ringBufferSize;
+  }
+
+  public void setProducerType(ProducerType producerType) {
+    this.producerType = producerType;
+  }
+
+  public void setWaitStrategy(WaitStrategy waitStrategy) {
+    this.waitStrategy = waitStrategy;
+  }
+
+  public void setRollingPolicy(RollingPolicy rollingPolicy) {
+    this.rollingPolicy = rollingPolicy;
   }
 
 }

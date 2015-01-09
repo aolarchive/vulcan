@@ -1,7 +1,7 @@
 package com.aol.advertising.dmp.disruptor.api.builder.steps;
 
-import com.aol.advertising.dmp.disruptor.DisruptorAvroFileWriter;
-import com.aol.advertising.dmp.disruptor.rolling.RollingPolicy;
+import com.aol.advertising.dmp.disruptor.api.DisruptorAvroFileWriter;
+import com.aol.advertising.dmp.disruptor.api.rolling.RollingPolicy;
 import com.aol.advertising.dmp.disruptor.rolling.TimeAndSizeBasedRollingPolicy;
 import com.lmax.disruptor.SleepingWaitStrategy;
 import com.lmax.disruptor.WaitStrategy;
@@ -16,7 +16,7 @@ public interface OptionalSteps {
    * <p>
    * Default is 1024 entries
    */
-  OptionalSteps withARingBufferOfSize(int ringBufferSize);
+  OptionalSteps withRingBufferSize(int ringBufferSize);
 
   /**
    * Configures a disruptor suitable for a producer of type {@code producerType}. Note that a
@@ -25,7 +25,7 @@ public interface OptionalSteps {
    * <p>
    * Default is {@link ProducerType#MULTI}
    */
-  OptionalSteps withAProducerOfType(final ProducerType producerType);
+  OptionalSteps withProducerType(final ProducerType producerType);
 
   /**
    * Configures the Avro writer with the waiting strategy {@code waitStrategy}. The waiting strategy

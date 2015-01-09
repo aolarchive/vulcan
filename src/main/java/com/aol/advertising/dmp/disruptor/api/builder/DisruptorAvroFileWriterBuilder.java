@@ -1,19 +1,21 @@
 package com.aol.advertising.dmp.disruptor.api.builder;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.concurrent.Executors;
 
 import org.apache.avro.Schema;
+import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.aol.advertising.dmp.disruptor.DisruptorAvroFileWriter;
+import com.aol.advertising.dmp.disruptor.api.DisruptorAvroFileWriter;
+import com.aol.advertising.dmp.disruptor.api.builder.steps.AvroFileNameStep;
 import com.aol.advertising.dmp.disruptor.api.builder.steps.AvroSchemaStep;
-import com.aol.advertising.dmp.disruptor.api.builder.steps.MandatorySteps;
 import com.aol.advertising.dmp.disruptor.api.builder.steps.OptionalSteps;
 import com.aol.advertising.dmp.disruptor.api.builder.steps.Steps;
+import com.aol.advertising.dmp.disruptor.api.rolling.RollingPolicy;
 import com.aol.advertising.dmp.disruptor.ringbuffer.BufferEventFactory;
-import com.aol.advertising.dmp.disruptor.rolling.RollingPolicy;
 import com.aol.advertising.dmp.disruptor.rolling.TimeAndSizeBasedRollingPolicy;
 import com.lmax.disruptor.SleepingWaitStrategy;
 import com.lmax.disruptor.WaitStrategy;
@@ -53,7 +55,7 @@ public class DisruptorAvroFileWriterBuilder implements Steps {
   /**
    * Start creating a {@link DisruptorAvroFileWriter}
    */
-  public static MandatorySteps createNewWriter() {
+  public static AvroFileNameStep createNewWriter() {
     final DisruptorAvroFileWriterBuilder newBuilder = new DisruptorAvroFileWriterBuilder();
     newBuilder.useSensibleDefaults();
     return newBuilder;
@@ -73,10 +75,30 @@ public class DisruptorAvroFileWriterBuilder implements Steps {
     return this;
   }
   
-  private void validateFile(final File avroFileName) {
+  private void validateFile(final File avroFileName) throws IllegalArgumentException {
     if (avroFileName == null) {
       throw new IllegalArgumentException("Specified Avro file was null");
     }
+    if (avroFileName.exists()) {
+      validateFileIsNotADir(avroFileName);
+      validateFilePermissions(avroFileName);
+    } else {
+      final File parentDirName = avroFileName.toPath().getParent().toFile();
+      if (parentDirName.isDirectory() && parentDirName.exists()) {
+        validateDirPermissions(parentDirName);
+      } else {
+        createParentDir(parentDirName);
+      }
+    }
+  }
+
+  private void validateFileIsNotADir(final File avroFileName) throws IllegalArgumentException {
+    if (avroFileName.isDirectory()) {
+      throw new IllegalArgumentException("Specified Avro file exists and it is a directory");
+    }
+  }
+
+  private void validateFilePermissions(final File avroFileName) throws IllegalArgumentException {
     if (!avroFileName.canRead()) {
       throw new IllegalArgumentException("Specified Avro file needs to be readable");
     }
@@ -85,8 +107,28 @@ public class DisruptorAvroFileWriterBuilder implements Steps {
     }
   }
 
+  private void validateDirPermissions(final File parentDirName) throws IllegalArgumentException {
+    if (!parentDirName.canRead()) {
+      throw new IllegalArgumentException("Parent directory of specified Avro file needs to be readable");
+    }
+    if (!parentDirName.canWrite()) {
+      throw new IllegalArgumentException("Parent directory of specified Avro file needs to be writable");
+    }
+    if (!parentDirName.canExecute()) {
+      throw new IllegalArgumentException("Parent directory of specified Avro file needs to be executable");
+    }
+  }
+
+  private void createParentDir(final File parentDirName) throws IllegalArgumentException {
+    try {
+      FileUtils.forceMkdir(parentDirName);
+    } catch (IOException e) {
+      throw new IllegalArgumentException(e);
+    }
+  }
+
   @Override
-  public OptionalSteps thatWritesRecordsWith(final Schema avroSchema) throws IllegalArgumentException {
+  public OptionalSteps thatWritesRecordsOf(final Schema avroSchema) throws IllegalArgumentException {
     if (avroSchema == null) {
       throw new IllegalArgumentException("Specified Avro schema was null");
     }
@@ -95,13 +137,13 @@ public class DisruptorAvroFileWriterBuilder implements Steps {
   }
 
   @Override
-  public OptionalSteps withARingBufferOfSize(int ringBufferSize) {
+  public OptionalSteps withRingBufferSize(int ringBufferSize) {
     this.ringBufferSize = ringBufferSize;
     return this;
   }
 
   @Override
-  public OptionalSteps withAProducerOfType(final ProducerType producerType) {
+  public OptionalSteps withProducerType(final ProducerType producerType) {
     if (producerType != null) {
       this.producerType = producerType;
     } else {
@@ -137,8 +179,7 @@ public class DisruptorAvroFileWriterBuilder implements Steps {
                                                         Executors.newSingleThreadExecutor(),
                                                         producerType,
                                                         waitStrategy);
-    //config handlers y tal
+    //config handlers, exceptions, etc
     return writerUnderConstruction;
   }
-
 }
