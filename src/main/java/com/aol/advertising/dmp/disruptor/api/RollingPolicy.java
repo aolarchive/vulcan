@@ -1,4 +1,4 @@
-package com.aol.advertising.dmp.disruptor.api.rolling;
+package com.aol.advertising.dmp.disruptor.api;
 
 import java.io.File;
 
@@ -24,6 +24,6 @@ public interface RollingPolicy {
    * 
    * @return the name of the next rolled file
    */
-  String getNextRolledFileName(final File avroFileName, int indexOfLastRolledFile);
+  String getNextRolledFileName(final File avroFileName);
 
 }

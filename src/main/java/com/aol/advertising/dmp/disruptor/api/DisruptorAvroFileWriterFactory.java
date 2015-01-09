@@ -1,12 +1,9 @@
-package com.aol.advertising.dmp.disruptor.api.factory;
+package com.aol.advertising.dmp.disruptor.api;
 
 import java.io.File;
 
 import org.apache.avro.Schema;
 
-import com.aol.advertising.dmp.disruptor.api.DisruptorAvroFileWriter;
-import com.aol.advertising.dmp.disruptor.api.builder.DisruptorAvroFileWriterBuilder;
-import com.aol.advertising.dmp.disruptor.api.rolling.RollingPolicy;
 import com.lmax.disruptor.WaitStrategy;
 import com.lmax.disruptor.dsl.ProducerType;
 

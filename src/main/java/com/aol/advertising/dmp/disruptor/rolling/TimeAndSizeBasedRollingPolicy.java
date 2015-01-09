@@ -4,7 +4,7 @@ import java.io.File;
 
 import org.apache.avro.specific.SpecificRecord;
 
-import com.aol.advertising.dmp.disruptor.api.rolling.RollingPolicy;
+import com.aol.advertising.dmp.disruptor.api.RollingPolicy;
 
 public class TimeAndSizeBasedRollingPolicy implements RollingPolicy {
 
@@ -20,7 +20,7 @@ public class TimeAndSizeBasedRollingPolicy implements RollingPolicy {
   }
 
   @Override
-  public String getNextRolledFileName(final File avroFileName, int indexOfLastRolledFile) {
+  public String getNextRolledFileName(final File avroFileName) {
     return null;
   }
 

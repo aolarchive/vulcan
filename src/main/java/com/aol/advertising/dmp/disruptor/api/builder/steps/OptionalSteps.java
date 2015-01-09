@@ -1,7 +1,7 @@
 package com.aol.advertising.dmp.disruptor.api.builder.steps;
 
 import com.aol.advertising.dmp.disruptor.api.DisruptorAvroFileWriter;
-import com.aol.advertising.dmp.disruptor.api.rolling.RollingPolicy;
+import com.aol.advertising.dmp.disruptor.api.RollingPolicy;
 import com.aol.advertising.dmp.disruptor.rolling.TimeAndSizeBasedRollingPolicy;
 import com.lmax.disruptor.SleepingWaitStrategy;
 import com.lmax.disruptor.WaitStrategy;

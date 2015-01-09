@@ -1,4 +1,4 @@
-package com.aol.advertising.dmp.disruptor.api.builder;
+package com.aol.advertising.dmp.disruptor.api;
 
 import java.io.File;
 import java.io.IOException;
@@ -9,14 +9,16 @@ import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.aol.advertising.dmp.disruptor.api.DisruptorAvroFileWriter;
 import com.aol.advertising.dmp.disruptor.api.builder.steps.AvroFileNameStep;
 import com.aol.advertising.dmp.disruptor.api.builder.steps.AvroSchemaStep;
 import com.aol.advertising.dmp.disruptor.api.builder.steps.OptionalSteps;
 import com.aol.advertising.dmp.disruptor.api.builder.steps.Steps;
-import com.aol.advertising.dmp.disruptor.api.rolling.RollingPolicy;
-import com.aol.advertising.dmp.disruptor.ringbuffer.BufferEventFactory;
+import com.aol.advertising.dmp.disruptor.exception.DisruptorExceptionHandler;
+import com.aol.advertising.dmp.disruptor.ringbuffer.AvroEvent;
+import com.aol.advertising.dmp.disruptor.ringbuffer.AvroEventFactory;
 import com.aol.advertising.dmp.disruptor.rolling.TimeAndSizeBasedRollingPolicy;
+import com.aol.advertising.dmp.disruptor.writer.AvroEventConsumer;
+import com.aol.advertising.dmp.disruptor.writer.AvroEventPublisher;
 import com.lmax.disruptor.SleepingWaitStrategy;
 import com.lmax.disruptor.WaitStrategy;
 import com.lmax.disruptor.dsl.Disruptor;
@@ -37,9 +39,9 @@ import com.lmax.disruptor.dsl.ProducerType;
 public class DisruptorAvroFileWriterBuilder implements Steps {
 
   private static final Logger log = LoggerFactory.getLogger(DisruptorAvroFileWriterBuilder.class);
-  private static final BufferEventFactory bufferEventFactory = new BufferEventFactory();
+  private static final AvroEventFactory bufferEventFactory = new AvroEventFactory();
 
-  private DisruptorAvroFileWriterImp writerUnderConstruction;
+  private AvroEventPublisher publisherUnderConstruction;
   
   private File avroFileName;
   private Schema avroSchema;
@@ -49,7 +51,7 @@ public class DisruptorAvroFileWriterBuilder implements Steps {
   private RollingPolicy rollingPolicy;
 
   private DisruptorAvroFileWriterBuilder() {
-    writerUnderConstruction = new DisruptorAvroFileWriterImp();
+    publisherUnderConstruction = new AvroEventPublisher();
   }
 
   /**
@@ -174,12 +176,19 @@ public class DisruptorAvroFileWriterBuilder implements Steps {
 
   @Override
   public DisruptorAvroFileWriter build() {
-    writerUnderConstruction.disruptor = new Disruptor<>(bufferEventFactory,
-                                                        ringBufferSize,
-                                                        Executors.newSingleThreadExecutor(),
-                                                        producerType,
-                                                        waitStrategy);
-    //config handlers, exceptions, etc
-    return writerUnderConstruction;
+    publisherUnderConstruction.startPublisherUsing(buildDisruptor());
+    return publisherUnderConstruction;
+  }
+
+  @SuppressWarnings("unchecked")
+  private Disruptor<AvroEvent> buildDisruptor() {
+    final Disruptor<AvroEvent> disruptor = new Disruptor<>(bufferEventFactory,
+                                                           ringBufferSize,
+                                                           Executors.newSingleThreadExecutor(),
+                                                           producerType,
+                                                           waitStrategy);
+    disruptor.handleExceptionsWith(new DisruptorExceptionHandler());
+    disruptor.handleEventsWith(new AvroEventConsumer(avroFileName, avroSchema, rollingPolicy));
+    return disruptor;
   }
 }
