@@ -7,8 +7,8 @@ public interface AvroFileNameStep {
   /**
    * Configures the file writer to write to {@code avroFileName}.
    * 
-   * @throws IllegalArgumentException if the file does not have read/write permissions or exists but
-   *         it's a directory
+   * @throws IllegalArgumentException if it is not possible to read and write to the specified
+   *         destination
    */
   AvroSchemaStep thatWritesTo(final File avroFileName) throws IllegalArgumentException;
 
