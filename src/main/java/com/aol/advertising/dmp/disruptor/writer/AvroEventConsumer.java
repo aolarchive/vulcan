@@ -41,7 +41,7 @@ public class AvroEventConsumer implements EventHandler<AvroEvent>, LifecycleAwar
   @Override
   public void onShutdown() {
     try {
-      writeToDisk();
+      avroFileWriter.close();
     } catch (IOException e) {
       throw new RuntimeException(e);
     }

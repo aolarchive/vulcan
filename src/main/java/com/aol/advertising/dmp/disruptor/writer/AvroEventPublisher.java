@@ -1,5 +1,7 @@
 package com.aol.advertising.dmp.disruptor.writer;
 
+import java.util.concurrent.ExecutorService;
+
 import org.apache.avro.specific.SpecificRecord;
 
 import com.aol.advertising.dmp.disruptor.api.DisruptorAvroFileWriter;
@@ -11,6 +13,7 @@ public class AvroEventPublisher implements DisruptorAvroFileWriter, EventTransla
 
   private volatile boolean disruptorIsRunning;
   private Disruptor<AvroEvent> disruptor;
+  private ExecutorService consumerExecutor;
 
   public AvroEventPublisher() {
     disruptorIsRunning = false;
@@ -34,12 +37,17 @@ public class AvroEventPublisher implements DisruptorAvroFileWriter, EventTransla
 
   /*
    * Call to shutdown may never return if publishing has not stopped before calling, thus the need
-   * for the flag. See com.lmax.disruptor.dsl.Disruptor#shutdown()
+   * for the volatile flag. See com.lmax.disruptor.dsl.Disruptor#shutdown()
    */
   @Override
   public void close() throws Exception {
-    disruptorIsRunning = false;
     disruptor.shutdown();
+    consumerExecutor.shutdown();
+    disruptorIsRunning = false;
+  }
+
+  public void registerConsumerExecutorForShutdown(final ExecutorService consumerExecutor) {
+    this.consumerExecutor = consumerExecutor;
   }
 
   public void startPublisherUsing(final Disruptor<AvroEvent> fullyConfiguredDisruptor) {

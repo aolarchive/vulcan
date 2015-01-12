@@ -21,7 +21,7 @@ public class TimeAndSizeBasedRollingPolicy implements RollingPolicy {
 
   @Override
   public String getNextRolledFileName(final File avroFileName) {
-    return "blah";
+    return "/tmp/blah";
   }
 
 }

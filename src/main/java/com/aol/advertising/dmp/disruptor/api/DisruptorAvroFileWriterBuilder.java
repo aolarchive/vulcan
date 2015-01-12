@@ -2,6 +2,7 @@ package com.aol.advertising.dmp.disruptor.api;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import org.apache.avro.Schema;
@@ -40,6 +41,7 @@ public class DisruptorAvroFileWriterBuilder implements Steps {
 
   private static final Logger log = LoggerFactory.getLogger(DisruptorAvroFileWriterBuilder.class);
   private static final AvroEventFactory bufferEventFactory = new AvroEventFactory();
+  private static final ExecutorService consumerExecutor = Executors.newSingleThreadExecutor();
 
   private AvroEventPublisher publisherUnderConstruction;
   
@@ -176,6 +178,7 @@ public class DisruptorAvroFileWriterBuilder implements Steps {
 
   @Override
   public DisruptorAvroFileWriter build() {
+    publisherUnderConstruction.registerConsumerExecutorForShutdown(consumerExecutor);
     publisherUnderConstruction.startPublisherUsing(buildDisruptor());
     return publisherUnderConstruction;
   }
@@ -184,7 +187,7 @@ public class DisruptorAvroFileWriterBuilder implements Steps {
   private Disruptor<AvroEvent> buildDisruptor() {
     final Disruptor<AvroEvent> disruptor = new Disruptor<>(bufferEventFactory,
                                                            ringBufferSize,
-                                                           Executors.newSingleThreadExecutor(),
+                                                           consumerExecutor,
                                                            producerType,
                                                            waitStrategy);
     disruptor.handleExceptionsWith(new DisruptorExceptionHandler());
