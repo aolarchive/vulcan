@@ -1,25 +1,27 @@
 package com.aol.advertising.dmp.disruptor.exception;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.lmax.disruptor.ExceptionHandler;
 
 public class DisruptorExceptionHandler implements ExceptionHandler {
 
-  @Override
-  public void handleEventException(Throwable ex, long sequence, Object event) {
-    // TODO Auto-generated method stub
+  private static final Logger log = LoggerFactory.getLogger(DisruptorExceptionHandler.class);
 
+  @Override
+  public void handleEventException(final Throwable ex, long sequence, final Object event) {
+    log.warn("Could not write record\n{}\ndue to", event, ex);
   }
 
   @Override
-  public void handleOnStartException(Throwable ex) {
-    // TODO Auto-generated method stub
-
+  public void handleOnStartException(final Throwable ex) {
+    log.error("Failed to initialize the events consumer. Avro records will not be written to file", ex);
   }
 
   @Override
-  public void handleOnShutdownException(Throwable ex) {
-    // TODO Auto-generated method stub
-
+  public void handleOnShutdownException(final Throwable ex) {
+    log.warn("Exception while shutting down events consumer", ex);
   }
 
 }

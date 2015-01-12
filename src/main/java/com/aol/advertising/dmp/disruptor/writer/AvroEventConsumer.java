@@ -40,8 +40,11 @@ public class AvroEventConsumer implements EventHandler<AvroEvent>, LifecycleAwar
 
   @Override
   public void onShutdown() {
-    // TODO Auto-generated method stub
-
+    try {
+      writeToDisk();
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
   }
   
   @Override
@@ -74,27 +77,22 @@ public class AvroEventConsumer implements EventHandler<AvroEvent>, LifecycleAwar
 
   private void bindWriterToAvroFile() throws IOException {
     if (avroFileName.exists()) {
-      rollFileIfSchemasDiffer();
-      avroFileWriter.appendTo(avroFileName);
+      ensureBindingToAFileWithConfiguredSchema();
     } else {
       avroFileWriter.create(avroSchema, avroFileName);
     }
   }
 
-  private void rollFileIfSchemasDiffer() {
-    try {
-      tryToRollFileIfSchemasDiffer();
-    } catch (IOException e) {
-      throw new RuntimeException(e);
+  private void ensureBindingToAFileWithConfiguredSchema() throws IOException {
+    if (schemasDiffer()) {
+      rollFile();
+    } else {
+      avroFileWriter.appendTo(avroFileName);
     }
   }
-
-  private void tryToRollFileIfSchemasDiffer() throws IOException {
-    final DataFileReader<SpecificRecord> avroFileReader = new DataFileReader<>(avroFileName,
-                                                                               new GenericDatumReader<SpecificRecord>());
-    if (!avroFileReader.getSchema().equals(avroSchema)) {
-      rollFile();
-    }
+  
+  private boolean schemasDiffer() throws IOException {
+    return ! new DataFileReader<>(avroFileName, new GenericDatumReader<SpecificRecord>()).getSchema().equals(avroSchema);
   }
 
   private void writeToDisk() throws IOException {
@@ -129,4 +127,5 @@ public class AvroEventConsumer implements EventHandler<AvroEvent>, LifecycleAwar
     getNewFileWriter();
     avroFileWriter.create(avroSchema, avroFileName);
   }
+
 }

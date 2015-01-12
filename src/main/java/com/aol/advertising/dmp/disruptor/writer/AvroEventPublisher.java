@@ -5,22 +5,26 @@ import org.apache.avro.specific.SpecificRecord;
 import com.aol.advertising.dmp.disruptor.api.DisruptorAvroFileWriter;
 import com.aol.advertising.dmp.disruptor.ringbuffer.AvroEvent;
 import com.lmax.disruptor.EventTranslatorOneArg;
-import com.lmax.disruptor.RingBuffer;
 import com.lmax.disruptor.dsl.Disruptor;
 
 public class AvroEventPublisher implements DisruptorAvroFileWriter, EventTranslatorOneArg<AvroEvent, SpecificRecord> {
 
-  private RingBuffer<AvroEvent> avroRingBuffer;
+  private volatile boolean disruptorIsRunning;
+  private Disruptor<AvroEvent> disruptor;
 
-  public AvroEventPublisher() {}
+  public AvroEventPublisher() {
+    disruptorIsRunning = false;
+  }
 
   @Override
   public void write(final SpecificRecord avroRecord) {
-    publishRecordToBuffer(avroRecord);
+    if (disruptorIsRunning) {
+      publishRecordToBuffer(avroRecord);
+    }
   }
 
   private void publishRecordToBuffer(final SpecificRecord avroRecord) {
-    avroRingBuffer.publishEvent(this, avroRecord);
+    disruptor.publishEvent(this, avroRecord);
   }
 
   @Override
@@ -28,14 +32,19 @@ public class AvroEventPublisher implements DisruptorAvroFileWriter, EventTransla
     avroEvent.setAvroRecord(avroRecord);
   }
 
+  /*
+   * Call to shutdown may never return if publishing has not stopped before calling, thus the need
+   * for the flag. See com.lmax.disruptor.dsl.Disruptor#shutdown()
+   */
   @Override
   public void close() throws Exception {
-    // close executor with awaitTermination
-    // flush writer
-    // close disruptor preventing event publishing to the ringbuffer with a volatile flag
+    disruptorIsRunning = false;
+    disruptor.shutdown();
   }
 
   public void startPublisherUsing(final Disruptor<AvroEvent> fullyConfiguredDisruptor) {
-    avroRingBuffer = fullyConfiguredDisruptor.start();
+    disruptor = fullyConfiguredDisruptor;
+    disruptor.start();
+    disruptorIsRunning = true;
   }
 }
