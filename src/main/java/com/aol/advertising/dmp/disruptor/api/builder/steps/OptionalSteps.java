@@ -39,7 +39,8 @@ public interface OptionalSteps {
   /**
    * Rolling policy for the destination Avro file
    * <p>
-   * Default is {@link TimeAndSizeBasedRollingPolicy} with a maximum file size of 50MB
+   * Default is {@link TimeAndSizeBasedRollingPolicy} with a maximum file size of 50MB and rolling
+   * period of 10 indexes
    */
   OptionalSteps withRollingPolicy(final RollingPolicy rollingPolicy);
 

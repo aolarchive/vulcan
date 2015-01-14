@@ -69,13 +69,13 @@ public class DisruptorAvroFileWriterBuilder implements Steps {
     ringBufferSize = 1024;
     producerType = ProducerType.MULTI;
     waitStrategy = new SleepingWaitStrategy();
-    rollingPolicy = new TimeAndSizeBasedRollingPolicy(50);
   }
 
   @Override
   public AvroSchemaStep thatWritesTo(final File avroFileName) throws IllegalArgumentException {
     validateFile(avroFileName);
     this.avroFileName = avroFileName;
+    initDefaultRollingPolicy(this.avroFileName);
     return this;
   }
   
@@ -87,7 +87,7 @@ public class DisruptorAvroFileWriterBuilder implements Steps {
       validateFileIsNotADir(avroFileName);
       validateFilePermissions(avroFileName);
     } else {
-      final File parentDirName = avroFileName.toPath().getParent().toFile();
+      final File parentDirName = avroFileName.getParentFile();
       if (parentDirName.exists() && parentDirName.isDirectory()) {
         validateDirPermissions(parentDirName);
       } else {
@@ -129,6 +129,10 @@ public class DisruptorAvroFileWriterBuilder implements Steps {
     } catch (IOException e) {
       throw new IllegalArgumentException(e);
     }
+  }
+
+  private void initDefaultRollingPolicy(final File avroFileName) {
+    rollingPolicy = new TimeAndSizeBasedRollingPolicy(50, 9, avroFileName);
   }
 
   @Override

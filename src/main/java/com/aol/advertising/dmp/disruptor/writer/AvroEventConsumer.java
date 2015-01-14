@@ -51,9 +51,9 @@ public class AvroEventConsumer implements EventHandler<AvroEvent>, LifecycleAwar
   public void onEvent(final AvroEvent event, long _, boolean endOfBatch) throws Exception {
     final SpecificRecord avroRecord = event.getAvroRecord();
     avroFileWriter.append(avroRecord);
+    applyRollingPolicy(avroRecord);
     if (endOfBatch) {
       writeToDisk();
-      applyRollingPolicy(avroRecord);
     }
   }
 
@@ -107,6 +107,7 @@ public class AvroEventConsumer implements EventHandler<AvroEvent>, LifecycleAwar
 
   private void rollFile() throws IOException {
     avroFileWriter.close();
+    rollingPolicy.signalRolloverOf(avroFileName);
     renameAvroFileTo(rollingPolicy.getNextRolledFileName(avroFileName));
     rewireWriter();
   }
