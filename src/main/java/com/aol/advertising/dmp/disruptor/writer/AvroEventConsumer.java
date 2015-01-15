@@ -17,7 +17,7 @@ import com.lmax.disruptor.LifecycleAware;
 
 public class AvroEventConsumer implements EventHandler<AvroEvent>, LifecycleAware {
   
-  private static final int TWO_MB_IN_BYTES = 2097152;
+  private static final int TWO_MB_IN_BYTES = 2_097_152;
 
   private final File avroFileName;
   private final Schema avroSchema;

@@ -9,7 +9,7 @@ import java.io.File;
  */
 class SizeBasedRollingCondition {
 
-  private static final int BYTES_IN_A_MB = 1_048_576;
+  private static final int ONE_MB_IN_BYTES = 1_048_576;
   private static final double DECAY_RATE = 0.2;
   private static final double DECAY_RATE_COMPLEMENT = 1.0 - DECAY_RATE;
 
@@ -20,7 +20,7 @@ class SizeBasedRollingCondition {
   private double writeRate;
   
   SizeBasedRollingCondition(long initialFileSize, int rolloverTriggeringSizeInMB) {
-    this.rolloverTriggeringSizeInBytes = rolloverTriggeringSizeInMB * BYTES_IN_A_MB;
+    this.rolloverTriggeringSizeInBytes = rolloverTriggeringSizeInMB * ONE_MB_IN_BYTES;
 
     this.recordsInCurrentFile = 0;
     this.delegateImplementation = new EMAWarmupPeriod(initialFileSize);
@@ -43,6 +43,7 @@ class SizeBasedRollingCondition {
   private class EMAWarmupPeriod implements RolloverShouldHappen {
 
     private static final int FIXED_SIZE_CHECK_RATE = 100;
+    private static final int SCHEMA_SIZE_EPSILON = 5000;
     
     private long initialFileSize;
 
@@ -56,7 +57,7 @@ class SizeBasedRollingCondition {
         final long currentFileSize = avroFileName.length();
         if (writeToDiskHasHappened(currentFileSize)) {
           calculateInitialInstantRate(currentFileSize);
-          estimateNumberOfRecordsInFile(currentFileSize);
+          estimateTotalNumberOfRecordsInFile(currentFileSize);
           switchToEMAReady();
           return currentFileSize >= rolloverTriggeringSizeInBytes;
         }
@@ -66,12 +67,16 @@ class SizeBasedRollingCondition {
 
     @Override
     public void signalRolloverOf(final File avroFileName) {
-      initialFileSize = avroFileName.length();
+      initialFileSize = 0;
       recordsInCurrentFile = 0;
     }
 
     private boolean writeToDiskHasHappened(long currentFileSize) {
-      return currentFileSize > initialFileSize;
+      return recordsWriteHasHappened(currentFileSize);
+    }
+
+    private boolean recordsWriteHasHappened(long currentFileSize) {
+      return currentFileSize - SCHEMA_SIZE_EPSILON > initialFileSize;
     }
 
     // Base case of EMA
@@ -79,7 +84,7 @@ class SizeBasedRollingCondition {
       writeRate = (currentFileSize - initialFileSize) / (double) recordsInCurrentFile;
     }
 
-    private void estimateNumberOfRecordsInFile(long currentFileSize) {
+    private void estimateTotalNumberOfRecordsInFile(long currentFileSize) {
       recordsInCurrentFile = (int) (currentFileSize / writeRate);
     }
 
