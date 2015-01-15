@@ -14,6 +14,10 @@ class TimeBasedRollingCondition {
     return lastTimeRolloverHappenedBeforeToday();
   }
 
+  void signalRollover() {
+    lastRolloverDate = UTCDateTime.now();
+  }
+
   private boolean lastTimeRolloverHappenedBeforeToday() {
     return lastRolloverDate.isBefore(UTCDateTime.beginningOfToday());
   }

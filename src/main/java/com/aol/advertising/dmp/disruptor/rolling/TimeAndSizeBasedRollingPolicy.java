@@ -71,6 +71,7 @@ public class TimeAndSizeBasedRollingPolicy implements RollingPolicy {
 
   @Override
   public void signalRolloverOf(final File avroFileName) {
+    timeBasedRollingCondition.signalRollover();
     sizeBasedRollingCondition.signalRolloverOf(avroFileName);
   }
 
