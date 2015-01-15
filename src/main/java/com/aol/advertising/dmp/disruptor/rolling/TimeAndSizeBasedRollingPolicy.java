@@ -84,22 +84,26 @@ public class TimeAndSizeBasedRollingPolicy implements RollingPolicy {
   }
 
   private void determineInitialRollingIndex() throws SecurityException {
-    getHighestIndexInRangeFromDir();
-    getNextIndexInRange();
+    final int highestIndexInRangeFromDir = getHighestIndexInRangeFromDir();
+    setCurrentIndexToNextAvailableIndex(highestIndexInRangeFromDir);
   }
 
-  private void getHighestIndexInRangeFromDir() {
+  private int getHighestIndexInRangeFromDir() {
     int highestIndex = Integer.MIN_VALUE;
     for (File archivedFileName : avroFileName.getParentFile().listFiles()) {
       highestIndex = max(highestIndex, getIndexFrom(archivedFileName.getName()));
     }
-    currentRollingIndex = min(max(highestIndex, -1), rollingIndexRange);
+    return min(max(highestIndex, 0), rollingIndexRange);
   }
 
   private int getIndexFrom(final String archivedFileName) {
     final String avroFileNameWithoutExtension = removeFileExtension(avroFileName.getName());
     final Matcher fileIndexMatcher = Pattern.compile(avroFileNameWithoutExtension + ".+\\d{2}\\.(\\d+)").matcher(archivedFileName);
     return fileIndexMatcher.find() ? Integer.parseInt(fileIndexMatcher.group(1)) : Integer.MIN_VALUE;
+  }
+
+  private void setCurrentIndexToNextAvailableIndex(int highestIndexInRangeFromDir) {
+    currentRollingIndex = (1 + highestIndexInRangeFromDir) % (rollingIndexRange + 1);
   }
 
   private String removeFileExtension(final String fileName) {
