@@ -55,7 +55,7 @@ class SizeBasedRollingCondition {
     public boolean rolloverShouldHappen(final File avroFileName) {
       if ((++recordsInCurrentFile % FIXED_SIZE_CHECK_RATE) == 0) {
         final long currentFileSize = avroFileName.length();
-        if (writeToDiskHasHappened(currentFileSize)) {
+        if (recordsHaveBeenWrittenToDisk(currentFileSize)) {
           calculateInitialInstantRate(currentFileSize);
           estimateTotalNumberOfRecordsInFile(currentFileSize);
           switchToEMAReady();
@@ -71,12 +71,8 @@ class SizeBasedRollingCondition {
       recordsInCurrentFile = 0;
     }
 
-    private boolean writeToDiskHasHappened(long currentFileSize) {
-      return recordsWriteHasHappened(currentFileSize);
-    }
-
-    private boolean recordsWriteHasHappened(long currentFileSize) {
-      return currentFileSize - SCHEMA_SIZE_EPSILON > initialFileSize;
+    private boolean recordsHaveBeenWrittenToDisk(long currentFileSize) {
+      return currentFileSize > initialFileSize + SCHEMA_SIZE_EPSILON;
     }
 
     // Base case of EMA

@@ -98,8 +98,8 @@ public class TimeAndSizeBasedRollingPolicy implements RollingPolicy {
 
   private int getIndexFrom(final String archivedFileName) {
     final String avroFileNameWithoutExtension = removeFileExtension(avroFileName.getName());
-    final Matcher fileNameMatcher = Pattern.compile(avroFileNameWithoutExtension + ".+\\d{2}\\.(\\d+)").matcher(archivedFileName);
-    return fileNameMatcher.find() ? Integer.parseInt(fileNameMatcher.group(1)) : Integer.MIN_VALUE;
+    final Matcher fileIndexMatcher = Pattern.compile(avroFileNameWithoutExtension + ".+\\d{2}\\.(\\d+)").matcher(archivedFileName);
+    return fileIndexMatcher.find() ? Integer.parseInt(fileIndexMatcher.group(1)) : Integer.MIN_VALUE;
   }
 
   private String removeFileExtension(final String fileName) {
