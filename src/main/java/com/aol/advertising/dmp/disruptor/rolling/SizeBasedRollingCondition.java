@@ -42,8 +42,8 @@ class SizeBasedRollingCondition {
 
   private class EMAWarmupPeriod implements RolloverShouldHappen {
 
-    private static final int FIXED_SIZE_CHECK_RATE = 100;
-    private static final int SCHEMA_SIZE_EPSILON = 5000;
+    private static final int FIXED_SIZE_CHECK_RATE = 150;
+    private static final int SCHEMA_SIZE_EPSILON = 7000;
     
     private long initialFileSize;
 
