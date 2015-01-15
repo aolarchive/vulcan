@@ -88,7 +88,7 @@ public class DisruptorAvroFileWriterBuilder implements Steps {
       validateFilePermissions(avroFileName);
     } else {
       final File parentDirName = avroFileName.getParentFile();
-      if (parentDirName.exists() && parentDirName.isDirectory()) {
+      if (parentDirName.isDirectory()) {
         validateDirPermissions(parentDirName);
       } else {
         createParentDir(parentDirName);
