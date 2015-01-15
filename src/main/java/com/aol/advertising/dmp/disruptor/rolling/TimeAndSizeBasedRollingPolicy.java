@@ -58,7 +58,7 @@ public class TimeAndSizeBasedRollingPolicy implements RollingPolicy {
   public String getNextRolledFileName(final File _) {
     final String nextRolledFileName = avroFileName.getParent()
                                       + File.separatorChar
-                                      + getFileNameWithoutExtension(avroFileName.getName())
+                                      + removeFileExtension(avroFileName.getName())
                                       + "-"
                                       + dateTimeFormatterForRolledFiles.print(UTCDateTime.now())
                                       + "."
@@ -97,14 +97,13 @@ public class TimeAndSizeBasedRollingPolicy implements RollingPolicy {
   }
 
   private int getIndexFrom(final String archivedFileName) {
-    final String avroFileNameWithoutExtension = getFileNameWithoutExtension(avroFileName.getName());
+    final String avroFileNameWithoutExtension = removeFileExtension(avroFileName.getName());
     final Matcher fileNameMatcher = Pattern.compile(avroFileNameWithoutExtension + ".+\\d{2}\\.(\\d+)").matcher(archivedFileName);
     return fileNameMatcher.find() ? Integer.parseInt(fileNameMatcher.group(1)) : Integer.MIN_VALUE;
   }
 
-  private String getFileNameWithoutExtension(final String fileName) {
-    final Matcher fileNameMatcher = FILE_EXTENSION_PATTERN.matcher(fileName);
-    return fileNameMatcher.replaceAll("");
+  private String removeFileExtension(final String fileName) {
+    return FILE_EXTENSION_PATTERN.matcher(fileName).replaceAll("");
   }
 
   private void getNextIndexInRange() {
