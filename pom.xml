@@ -4,13 +4,14 @@
 
   <groupId>com.aol.dmp</groupId>
   <artifactId>disruptor_avro_writer</artifactId>
-  <version>0.1.0</version>
+  <version>1.0.0</version>
   <description>Disruptor-based Avro file writer</description>
   <packaging>jar</packaging>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <java.version>1.7</java.version>
+    <powermock.version>1.6.1</powermock.version>
   </properties>
 
   <distributionManagement>
@@ -102,6 +103,46 @@
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
       <version>4.12</version>
+      <scope>test</scope>
+      <exclusions>
+      	<exclusion>
+      		<artifactId>hamcrest-core</artifactId>
+      		<groupId>org.hamcrest</groupId>
+      	</exclusion>
+      </exclusions>
+    </dependency>
+    
+    <dependency>
+      <groupId>org.mockito</groupId>
+      <artifactId>mockito-core</artifactId>
+      <version>1.10.19</version>
+      <scope>test</scope>
+      <exclusions>
+      	<exclusion>
+      		<artifactId>hamcrest-core</artifactId>
+      		<groupId>org.hamcrest</groupId>
+      	</exclusion>
+      </exclusions>
+    </dependency>
+    
+    <dependency>
+      <groupId>org.powermock</groupId>
+      <artifactId>powermock-api-mockito</artifactId>
+      <version>${powermock.version}</version>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.powermock</groupId>
+      <artifactId>powermock-api-mockito</artifactId>
+      <version>${powermock.version}</version>
+      <scope>test</scope>
+    </dependency>
+    
+	  <dependency>
+      <groupId>org.hamcrest</groupId>
+      <artifactId>hamcrest-library</artifactId>
+      <version>1.3</version>
       <scope>test</scope>
     </dependency>
 
