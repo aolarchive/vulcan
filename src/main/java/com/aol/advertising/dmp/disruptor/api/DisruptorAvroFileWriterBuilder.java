@@ -1,12 +1,12 @@
 package com.aol.advertising.dmp.disruptor.api;
 
-import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import org.apache.avro.Schema;
-import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,12 +40,12 @@ import com.lmax.disruptor.dsl.ProducerType;
 public class DisruptorAvroFileWriterBuilder implements Steps {
 
   private static final Logger log = LoggerFactory.getLogger(DisruptorAvroFileWriterBuilder.class);
-  private static final AvroEventFactory bufferEventFactory = new AvroEventFactory();
+  private static final AvroEventFactory avroEventFactory = new AvroEventFactory();
   private static final ExecutorService consumerExecutor = Executors.newSingleThreadExecutor();
 
   private AvroEventPublisher publisherUnderConstruction;
   
-  private File avroFileName;
+  private Path avroFileName;
   private Schema avroSchema;
   private int ringBufferSize;
   private ProducerType producerType;
@@ -72,67 +72,63 @@ public class DisruptorAvroFileWriterBuilder implements Steps {
   }
 
   @Override
-  public AvroSchemaStep thatWritesTo(final File avroFileName) throws IllegalArgumentException {
-    validateFile(avroFileName);
+  public AvroSchemaStep thatWritesTo(final Path avroFileName) throws IllegalArgumentException {
     this.avroFileName = avroFileName;
-    initDefaultRollingPolicy(this.avroFileName);
+    validateFile();
+    initDefaultRollingPolicy();
     return this;
   }
   
-  private void validateFile(final File avroFileName) throws IllegalArgumentException {
+  private void validateFile() throws IllegalArgumentException {
     if (avroFileName == null) {
       throw new IllegalArgumentException("Specified Avro file was null");
     }
-    if (avroFileName.exists()) {
-      validateFileIsNotADir(avroFileName);
-      validateFilePermissions(avroFileName);
+    if (Files.exists(avroFileName)) {
+      validateFileIsNotADir();
+      validateFilePermissions();
     } else {
-      final File parentDirName = avroFileName.getParentFile();
-      if (parentDirName.isDirectory()) {
-        validateDirPermissions(parentDirName);
-      } else {
-        createParentDir(parentDirName);
-      }
+      validateDirPermissions();
     }
   }
 
-  private void validateFileIsNotADir(final File avroFileName) throws IllegalArgumentException {
-    if (avroFileName.isDirectory()) {
+  private void validateFileIsNotADir() throws IllegalArgumentException {
+    if (Files.isDirectory(avroFileName)) {
       throw new IllegalArgumentException("Specified Avro file exists and it is a directory");
     }
   }
 
-  private void validateFilePermissions(final File avroFileName) throws IllegalArgumentException {
-    if (!avroFileName.canRead()) {
+  private void validateFilePermissions() throws IllegalArgumentException {
+    if (!Files.isReadable(avroFileName)) {
       throw new IllegalArgumentException("Specified Avro file needs to be readable");
     }
-    if (!avroFileName.canWrite()) {
+    if (!Files.isWritable(avroFileName)) {
       throw new IllegalArgumentException("Specified Avro file needs to be writable");
     }
   }
 
-  private void validateDirPermissions(final File parentDirName) throws IllegalArgumentException {
-    if (!parentDirName.canRead()) {
-      throw new IllegalArgumentException("Parent directory of specified Avro file needs to be readable");
+  private void validateDirPermissions() throws IllegalArgumentException {
+    final Path directory = avroFileName.getParent();
+    if (!Files.isReadable(directory)) {
+      throw new IllegalArgumentException("Target directory for the specified Avro file needs to exist and be readable");
     }
-    if (!parentDirName.canWrite()) {
-      throw new IllegalArgumentException("Parent directory of specified Avro file needs to be writable");
+    if (!Files.isWritable(directory)) {
+      throw new IllegalArgumentException("Target directory for the specified Avro file needs to exist and be writable");
     }
-    if (!parentDirName.canExecute()) {
-      throw new IllegalArgumentException("Parent directory of specified Avro file needs to be executable");
+    if (!Files.isExecutable(directory)) {
+      throw new IllegalArgumentException("Target directory for the specified Avro file needs to exist and be executable");
     }
   }
 
-  private void createParentDir(final File parentDirName) throws IllegalArgumentException {
+  private void initDefaultRollingPolicy() {
     try {
-      FileUtils.forceMkdir(parentDirName);
-    } catch (IOException e) {
-      throw new IllegalArgumentException(e);
+      tryToInitDefaultRollingPolicy();
+    } catch (IOException ioe) {
+      throw new IllegalArgumentException(ioe);
     }
   }
 
-  private void initDefaultRollingPolicy(final File avroFileName) {
-    rollingPolicy = new TimeAndSizeBasedRollingPolicy(50, 9, avroFileName);
+  private void tryToInitDefaultRollingPolicy() throws IOException {
+    rollingPolicy = new TimeAndSizeBasedRollingPolicy(50, avroFileName);
   }
 
   @Override
@@ -189,7 +185,7 @@ public class DisruptorAvroFileWriterBuilder implements Steps {
 
   @SuppressWarnings("unchecked")
   private Disruptor<AvroEvent> buildDisruptor() {
-    final Disruptor<AvroEvent> disruptor = new Disruptor<>(bufferEventFactory,
+    final Disruptor<AvroEvent> disruptor = new Disruptor<>(avroEventFactory,
                                                            ringBufferSize,
                                                            consumerExecutor,
                                                            producerType,

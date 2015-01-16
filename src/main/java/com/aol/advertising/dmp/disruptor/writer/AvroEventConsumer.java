@@ -1,7 +1,9 @@
 package com.aol.advertising.dmp.disruptor.writer;
 
-import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 
 import org.apache.avro.Schema;
 import org.apache.avro.file.DataFileReader;
@@ -19,14 +21,14 @@ public class AvroEventConsumer implements EventHandler<AvroEvent>, LifecycleAwar
   
   private static final int TWO_MB_IN_BYTES = 2_097_152;
 
-  private final File avroFileName;
+  private final Path avroFileName;
   private final Schema avroSchema;
   private final RollingPolicy rollingPolicy;
   private final SpecificDatumWriter<SpecificRecord> datumWriter;
 
   private DataFileWriter<SpecificRecord> avroFileWriter;
 
-  public AvroEventConsumer(final File avroFileName, final Schema avroSchema, final RollingPolicy rollingPolicy) {
+  public AvroEventConsumer(final Path avroFileName, final Schema avroSchema, final RollingPolicy rollingPolicy) {
     this.avroFileName = avroFileName;
     this.avroSchema = avroSchema;
     this.rollingPolicy = rollingPolicy;
@@ -76,10 +78,10 @@ public class AvroEventConsumer implements EventHandler<AvroEvent>, LifecycleAwar
   }
 
   private void bindWriterToAvroFile() throws IOException {
-    if (avroFileName.exists()) {
+    if (Files.exists(avroFileName)) {
       ensureBindingToAFileWithConfiguredSchema();
     } else {
-      avroFileWriter.create(avroSchema, avroFileName);
+      avroFileWriter.create(avroSchema, avroFileName.toFile());
     }
   }
 
@@ -87,12 +89,15 @@ public class AvroEventConsumer implements EventHandler<AvroEvent>, LifecycleAwar
     if (schemasDiffer()) {
       rollFile();
     } else {
-      avroFileWriter.appendTo(avroFileName);
+      avroFileWriter.appendTo(avroFileName.toFile());
     }
   }
   
   private boolean schemasDiffer() throws IOException {
-    return ! new DataFileReader<>(avroFileName, new GenericDatumReader<SpecificRecord>()).getSchema().equals(avroSchema);
+    final DataFileReader<SpecificRecord> fileReader = new DataFileReader<>(avroFileName.toFile(), new GenericDatumReader<SpecificRecord>());
+    final Schema existingFileSchema = fileReader.getSchema();
+    fileReader.close();
+    return !existingFileSchema.equals(avroSchema);
   }
 
   private void writeToDisk() throws IOException {
@@ -107,26 +112,23 @@ public class AvroEventConsumer implements EventHandler<AvroEvent>, LifecycleAwar
 
   private void rollFile() throws IOException {
     avroFileWriter.close();
+    renameAvroFile();
     rollingPolicy.signalRolloverOf(avroFileName);
-    renameAvroFileTo(rollingPolicy.getNextRolledFileName(avroFileName));
     rewireWriter();
   }
 
-  private void renameAvroFileTo(final String rolledFileName) {
-    final File disposableFileObjectForRenaming = copyAvroFileObject();
-    final boolean renameSucceeded = disposableFileObjectForRenaming.renameTo(new File(rolledFileName));
-    if (!renameSucceeded) {
-      throw new RuntimeException("File \"" + rolledFileName + "\" could not be used to roll the current output Avro file");
+  private void renameAvroFile() {
+    final Path nextRolledFileName = rollingPolicy.getNextRolledFileName(avroFileName);
+    try {
+      Files.move(avroFileName, nextRolledFileName, StandardCopyOption.REPLACE_EXISTING);
+    } catch (IOException e) {
+      throw new RuntimeException("File \"" + nextRolledFileName + "\" could not be used to roll the current output Avro file");
     }
-  }
-  
-  private File copyAvroFileObject() {
-    return avroFileName.toPath().toFile();
   }
 
   private void rewireWriter() throws IOException {
     getNewFileWriter();
-    avroFileWriter.create(avroSchema, avroFileName);
+    avroFileWriter.create(avroSchema, avroFileName.toFile());
   }
 
 }

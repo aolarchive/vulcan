@@ -7,19 +7,19 @@ class TimeBasedRollingCondition {
   private DateTime lastRolloverDate;
 
   TimeBasedRollingCondition() {
-    lastRolloverDate = UTCDateTime.now();
+    lastRolloverDate = DateTime.now();
   }
 
   boolean rolloverShouldHappen() {
-    return lastTimeRolloverHappenedBeforeToday();
+    return lastRolloverHappenedBeforeToday();
   }
 
   void signalRollover() {
-    lastRolloverDate = UTCDateTime.now();
+    lastRolloverDate = DateTime.now();
   }
 
-  private boolean lastTimeRolloverHappenedBeforeToday() {
-    return lastRolloverDate.isBefore(UTCDateTime.beginningOfToday());
+  private boolean lastRolloverHappenedBeforeToday() {
+    return lastRolloverDate.isBefore(new DateTime().withTimeAtStartOfDay());
   }
 
 }

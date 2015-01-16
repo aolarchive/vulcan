@@ -1,6 +1,6 @@
 package com.aol.advertising.dmp.disruptor.api;
 
-import java.io.File;
+import java.nio.file.Path;
 
 import org.apache.avro.Schema;
 
@@ -14,7 +14,7 @@ import com.lmax.disruptor.dsl.ProducerType;
  */
 public class DisruptorAvroFileWriterFactory {
 
-  private File avroFileName;
+  private Path avroFileName;
   private Schema avroSchema;
   private int ringBufferSize;
   private ProducerType producerType;
@@ -32,11 +32,11 @@ public class DisruptorAvroFileWriterFactory {
   }
 
 
-  public void setAvroFileName(File avroFileName) {
+  public void setAvroFileName(final Path avroFileName) {
     this.avroFileName = avroFileName;
   }
 
-  public void setAvroSchema(Schema avroSchema) {
+  public void setAvroSchema(final Schema avroSchema) {
     this.avroSchema = avroSchema;
   }
 
@@ -44,15 +44,15 @@ public class DisruptorAvroFileWriterFactory {
     this.ringBufferSize = ringBufferSize;
   }
 
-  public void setProducerType(ProducerType producerType) {
+  public void setProducerType(final ProducerType producerType) {
     this.producerType = producerType;
   }
 
-  public void setWaitStrategy(WaitStrategy waitStrategy) {
+  public void setWaitStrategy(final WaitStrategy waitStrategy) {
     this.waitStrategy = waitStrategy;
   }
 
-  public void setRollingPolicy(RollingPolicy rollingPolicy) {
+  public void setRollingPolicy(final RollingPolicy rollingPolicy) {
     this.rollingPolicy = rollingPolicy;
   }
 

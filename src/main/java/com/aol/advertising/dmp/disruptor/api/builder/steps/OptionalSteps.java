@@ -20,7 +20,7 @@ public interface OptionalSteps {
 
   /**
    * Configures a disruptor suitable for a producer of type {@code producerType}. Note that a
-   * disruptor configured with {@link ProducerType#SINGLE} is more performant but not safe in a
+   * disruptor configured with {@link ProducerType#SINGLE} is more performant but not safe in an
    * environment with multiple producers.
    * <p>
    * Default is {@link ProducerType#MULTI}
@@ -39,8 +39,7 @@ public interface OptionalSteps {
   /**
    * Rolling policy for the destination Avro file
    * <p>
-   * Default is {@link TimeAndSizeBasedRollingPolicy} with a maximum file size of 50MB and rolling
-   * period of 10 indexes
+   * Default is {@link TimeAndSizeBasedRollingPolicy} with a maximum file size of 50MB
    */
   OptionalSteps withRollingPolicy(final RollingPolicy rollingPolicy);
 

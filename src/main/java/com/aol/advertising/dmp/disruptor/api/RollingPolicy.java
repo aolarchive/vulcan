@@ -1,6 +1,6 @@
 package com.aol.advertising.dmp.disruptor.api;
 
-import java.io.File;
+import java.nio.file.Path;
 
 import org.apache.avro.specific.SpecificRecord;
 
@@ -16,7 +16,7 @@ public interface RollingPolicy {
    * @param avroFileName the destination Avro file
    * @param avroRecord the Avro record from the latest event consumed from the ring buffer
    */
-  boolean shouldRollover(final File avroFileName, final SpecificRecord avroRecord);
+  boolean shouldRollover(final Path avroFileName, final SpecificRecord avroRecord);
   
   /**
    * Used to decide the name of the next file to be rolled
@@ -24,13 +24,13 @@ public interface RollingPolicy {
    * @param avroFileName the destination Avro file
    * @return the name of the next rolled file
    */
-  String getNextRolledFileName(final File avroFileName);
+  Path getNextRolledFileName(final Path avroFileName);
 
   /**
    * Used to signal rolling occurrences to the policy object
    * 
    * @param avroFileName the destination Avro file
    */
-  void signalRolloverOf(final File avroFileName);
+  void signalRolloverOf(final Path avroFileName);
 
 }
