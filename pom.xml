@@ -106,28 +106,30 @@
       <scope>test</scope>
       <exclusions>
       	<exclusion>
-      		<artifactId>hamcrest-core</artifactId>
       		<groupId>org.hamcrest</groupId>
+      		<artifactId>hamcrest-core</artifactId>
       	</exclusion>
       </exclusions>
     </dependency>
     
+    <!-- MockitoAnnotations.initMocks() seems to be bugged starting with 1.10.9. Do not increase the version until
+    the issue is solved -->
     <dependency>
       <groupId>org.mockito</groupId>
       <artifactId>mockito-core</artifactId>
-      <version>1.10.19</version>
+      <version>1.10.8</version>
       <scope>test</scope>
       <exclusions>
       	<exclusion>
-      		<artifactId>hamcrest-core</artifactId>
       		<groupId>org.hamcrest</groupId>
+      		<artifactId>hamcrest-core</artifactId>
       	</exclusion>
       </exclusions>
     </dependency>
     
     <dependency>
       <groupId>org.powermock</groupId>
-      <artifactId>powermock-api-mockito</artifactId>
+      <artifactId>powermock-module-junit4</artifactId>
       <version>${powermock.version}</version>
       <scope>test</scope>
     </dependency>
