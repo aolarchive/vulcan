@@ -21,7 +21,7 @@ public class DisruptorAvroFileWriterFactory {
   private WaitStrategy waitStrategy;
   private RollingPolicy rollingPolicy;
   
-  public DisruptorAvroFileWriter createNewWriter() throws IllegalArgumentException {
+  public DisruptorAvroFileWriter createNewWriter() {
     return DisruptorAvroFileWriterBuilder.createNewWriter().thatWritesTo(avroFileName)
                                                            .thatWritesRecordsOf(avroSchema)
                                                            .withRingBufferSize(ringBufferSize)

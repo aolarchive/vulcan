@@ -12,6 +12,6 @@ public interface AvroSchemaStep {
    * 
    * @throws IllegalArgumentException if the schema is null
    */
-  OptionalSteps thatWritesRecordsOf(final Schema avroSchema) throws IllegalArgumentException;
+  OptionalSteps thatWritesRecordsOf(final Schema avroSchema);
 
 }

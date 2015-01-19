@@ -22,13 +22,25 @@ class SizeBasedRollingCondition {
   private RolloverShouldHappen delegateImplementation;
   private double writeRate;
   
-  SizeBasedRollingCondition(final Path avroFileName, int rolloverTriggeringSizeInMB) throws IOException {
+  SizeBasedRollingCondition(final Path avroFileName, int rolloverTriggeringSizeInMB) {
     this.rolloverTriggeringSizeInBytes = rolloverTriggeringSizeInMB * ONE_MB_IN_BYTES;
     this.avroFileName = avroFileName;
 
     this.recordsInCurrentFile = 0;
-    this.delegateImplementation = new EMAWarmupPeriod(Files.exists(avroFileName) ? Files.size(avroFileName) : 0);
+    this.delegateImplementation = getWarmupDelegateImplementation();
     this.writeRate = 0.0;
+  }
+
+  private RolloverShouldHappen getWarmupDelegateImplementation() {
+    if (Files.exists(avroFileName)) {
+      try {
+        return new EMAWarmupPeriod(Files.size(avroFileName));
+      } catch (IOException ioe) {
+        throw new IllegalArgumentException(ioe);
+      }
+    } else {
+      return new EMAWarmupPeriod(0);
+    }
   }
 
   boolean rolloverShouldHappen() {
