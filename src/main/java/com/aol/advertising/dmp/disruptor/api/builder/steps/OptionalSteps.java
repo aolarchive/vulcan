@@ -1,7 +1,7 @@
 package com.aol.advertising.dmp.disruptor.api.builder.steps;
 
 import com.aol.advertising.dmp.disruptor.api.DisruptorAvroFileWriter;
-import com.aol.advertising.dmp.disruptor.api.rolling.RollingPolicy;
+import com.aol.advertising.dmp.disruptor.api.RollingPolicy;
 import com.aol.advertising.dmp.disruptor.rolling.TimeAndSizeBasedRollingPolicy;
 import com.lmax.disruptor.SleepingWaitStrategy;
 import com.lmax.disruptor.WaitStrategy;
@@ -20,7 +20,7 @@ public interface OptionalSteps {
 
   /**
    * Configures a disruptor suitable for a producer of type {@code producerType}. Note that a
-   * disruptor configured with {@link ProducerType#SINGLE} is more performant but not safe in a
+   * disruptor configured with {@link ProducerType#SINGLE} is more performant but not safe in an
    * environment with multiple producers.
    * <p>
    * Default is {@link ProducerType#MULTI}

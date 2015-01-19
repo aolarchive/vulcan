@@ -2,9 +2,6 @@ package com.aol.advertising.dmp.disruptor.api;
 
 import org.apache.avro.specific.SpecificRecord;
 
-import com.aol.advertising.dmp.disruptor.api.builder.DisruptorAvroFileWriterBuilder;
-import com.aol.advertising.dmp.disruptor.api.factory.DisruptorAvroFileWriterFactory;
-
 /**
  * Disruptor-based Avro writer. Consists of a <a
  * href="http://lmax-exchange.github.io/disruptor/">disruptor</a> buffer with a backend consumer

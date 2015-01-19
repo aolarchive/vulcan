@@ -5,9 +5,10 @@ import org.apache.avro.Schema;
 public interface AvroSchemaStep {
 
   /**
-   * Configures the Avro writer to compare {@code avroSchema} to the schema in the destination file
-   * during startup (if any). If schemas differ, the old file will be rolled and {@code avroSchema}
-   * used in the new file.
+   * Configures the Avro writer to append {@code avroSchema} to any created destination files.
+   * <p>
+   * During startup, it is compared to the schema in the destination file (if file exists). If
+   * schemas differ, the old file will be rolled and {@code avroSchema} used in the new one.
    * 
    * @throws IllegalArgumentException if the schema is null
    */
