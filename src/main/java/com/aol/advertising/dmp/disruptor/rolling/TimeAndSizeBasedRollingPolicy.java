@@ -72,9 +72,17 @@ public class TimeAndSizeBasedRollingPolicy implements RollingPolicy {
   @Override
   public void signalRolloverOf(final Path _) {
     final Path rolledFileName = getNextRolledFileName(avroFileName);
-    currentRollingIndex++;
+    updateCurrentRollingIndex();
     timeBasedRollingCondition.signalRollover();
     sizeBasedRollingCondition.signalFiledRolledTo(rolledFileName);
+  }
+
+  private void updateCurrentRollingIndex() {
+    if (timeBasedRollingCondition.rolloverShouldHappen()) {
+      currentRollingIndex = 0;
+    } else {
+      currentRollingIndex++;
+    }
   }
 
   private void init() {
