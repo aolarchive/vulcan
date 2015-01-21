@@ -59,7 +59,7 @@ public class DisruptorAvroFileWriterBuilder implements Steps {
   /**
    * Start creating a {@link DisruptorAvroFileWriter}
    */
-  public static AvroFileNameStep createNewWriter() {
+  public static AvroFileNameStep startCreatingANewWriter() {
     final DisruptorAvroFileWriterBuilder newBuilder = new DisruptorAvroFileWriterBuilder();
     newBuilder.useSensibleDefaults();
     return newBuilder;
@@ -72,14 +72,14 @@ public class DisruptorAvroFileWriterBuilder implements Steps {
   }
 
   @Override
-  public AvroSchemaStep thatWritesTo(final Path avroFileName) throws IllegalArgumentException {
+  public AvroSchemaStep thatWritesTo(final Path avroFileName) {
     this.avroFileName = avroFileName;
     validateFile();
     initDefaultRollingPolicy();
     return this;
   }
   
-  private void validateFile() throws IllegalArgumentException {
+  private void validateFile() {
     if (avroFileName == null) {
       throw new IllegalArgumentException("Specified Avro file was null");
     }
@@ -91,13 +91,13 @@ public class DisruptorAvroFileWriterBuilder implements Steps {
     }
   }
 
-  private void validateFileIsNotADir() throws IllegalArgumentException {
+  private void validateFileIsNotADir() {
     if (Files.isDirectory(avroFileName)) {
       throw new IllegalArgumentException("Specified Avro file exists and it is a directory");
     }
   }
 
-  private void validateFilePermissions() throws IllegalArgumentException {
+  private void validateFilePermissions() {
     if (!Files.isReadable(avroFileName)) {
       throw new IllegalArgumentException("Specified Avro file needs to be readable");
     }
@@ -106,7 +106,7 @@ public class DisruptorAvroFileWriterBuilder implements Steps {
     }
   }
 
-  private void validateDirPermissions() throws IllegalArgumentException {
+  private void validateDirPermissions() {
     final Path directory = avroFileName.getParent();
     if (!Files.isReadable(directory)) {
       throw new IllegalArgumentException("Target directory for the specified Avro file needs to exist and be readable");
@@ -132,7 +132,7 @@ public class DisruptorAvroFileWriterBuilder implements Steps {
   }
 
   @Override
-  public OptionalSteps thatWritesRecordsOf(final Schema avroSchema) throws IllegalArgumentException {
+  public OptionalSteps thatWritesRecordsOf(final Schema avroSchema) {
     if (avroSchema == null) {
       throw new IllegalArgumentException("Specified Avro schema was null");
     }
@@ -177,7 +177,7 @@ public class DisruptorAvroFileWriterBuilder implements Steps {
   }
 
   @Override
-  public DisruptorAvroFileWriter build() {
+  public DisruptorAvroFileWriter createNewWriter() {
     publisherUnderConstruction.registerConsumerExecutorForShutdown(consumerExecutor);
     publisherUnderConstruction.startPublisherUsing(buildDisruptor());
     return publisherUnderConstruction;

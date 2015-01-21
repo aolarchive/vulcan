@@ -10,6 +10,6 @@ public interface AvroFileNameStep {
    * @throws IllegalArgumentException if it is not possible to read and write to the specified
    *         destination
    */
-  AvroSchemaStep thatWritesTo(final Path avroFileName) throws IllegalArgumentException;
+  AvroSchemaStep thatWritesTo(final Path avroFileName);
 
 }

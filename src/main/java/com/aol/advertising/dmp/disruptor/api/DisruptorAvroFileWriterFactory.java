@@ -21,14 +21,14 @@ public class DisruptorAvroFileWriterFactory {
   private WaitStrategy waitStrategy;
   private RollingPolicy rollingPolicy;
   
-  public DisruptorAvroFileWriter createNewWriter() throws IllegalArgumentException {
-    return DisruptorAvroFileWriterBuilder.createNewWriter().thatWritesTo(avroFileName)
-                                                           .thatWritesRecordsOf(avroSchema)
-                                                           .withRingBufferSize(ringBufferSize)
-                                                           .withProducerType(producerType)
-                                                           .withWaitStrategy(waitStrategy)
-                                                           .withRollingPolicy(rollingPolicy)
-                                                           .build();
+  public DisruptorAvroFileWriter createNewWriter() {
+    return DisruptorAvroFileWriterBuilder.startCreatingANewWriter().thatWritesTo(avroFileName)
+                                                                   .thatWritesRecordsOf(avroSchema)
+                                                                   .withRingBufferSize(ringBufferSize)
+                                                                   .withProducerType(producerType)
+                                                                   .withWaitStrategy(waitStrategy)
+                                                                   .withRollingPolicy(rollingPolicy)
+                                                                   .createNewWriter();
   }
 
 

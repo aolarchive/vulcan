@@ -4,7 +4,7 @@
 
   <groupId>com.aol.dmp</groupId>
   <artifactId>disruptor_avro_writer</artifactId>
-  <version>1.0.0</version>
+  <version>2.0.0</version>
   <description>Disruptor-based Avro file writer</description>
   <packaging>jar</packaging>
 

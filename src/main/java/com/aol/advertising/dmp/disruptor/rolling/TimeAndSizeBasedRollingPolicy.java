@@ -43,7 +43,7 @@ public class TimeAndSizeBasedRollingPolicy implements RollingPolicy {
 
   private int currentRollingIndex;
 
-  public TimeAndSizeBasedRollingPolicy(int rolloverTriggeringSizeInMB, final Path avroFileName) throws IOException {
+  public TimeAndSizeBasedRollingPolicy(int rolloverTriggeringSizeInMB, final Path avroFileName) {
     this.timeBasedRollingCondition = new TimeBasedRollingCondition();
     this.sizeBasedRollingCondition = new SizeBasedRollingCondition(avroFileName, rolloverTriggeringSizeInMB);
     this.avroFileName = avroFileName;
@@ -72,9 +72,17 @@ public class TimeAndSizeBasedRollingPolicy implements RollingPolicy {
   @Override
   public void signalRolloverOf(final Path _) {
     final Path rolledFileName = getNextRolledFileName(avroFileName);
-    currentRollingIndex++;
+    updateCurrentRollingIndex();
     timeBasedRollingCondition.signalRollover();
     sizeBasedRollingCondition.signalFiledRolledTo(rolledFileName);
+  }
+
+  private void updateCurrentRollingIndex() {
+    if (timeBasedRollingCondition.rolloverShouldHappen()) {
+      currentRollingIndex = 0;
+    } else {
+      currentRollingIndex++;
+    }
   }
 
   private void init() {
