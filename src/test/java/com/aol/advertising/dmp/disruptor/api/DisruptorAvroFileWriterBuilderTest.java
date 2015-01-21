@@ -76,7 +76,7 @@ public class DisruptorAvroFileWriterBuilderTest {
     initMocks();
     wireUpMocks();
 
-    disruptorAvroFileWriterBuilderUnderTest = DisruptorAvroFileWriterBuilder.createNewWriter();
+    disruptorAvroFileWriterBuilderUnderTest = DisruptorAvroFileWriterBuilder.startCreatingANewWriter();
   }
   
   private void initMocks() throws Exception {
@@ -164,7 +164,7 @@ public class DisruptorAvroFileWriterBuilderTest {
   public void whenTheDestinationFileIsValid_andAWriterIsBuilt_thenTheConfiguredDestinationFileIsUsedToBuildTheWriter() throws Exception {
     givenDestinationFileIsValid();
     
-    disruptorAvroFileWriterBuilderUnderTest.thatWritesTo(avroFileNameMock).thatWritesRecordsOf(avroSchemaMock).build();
+    disruptorAvroFileWriterBuilderUnderTest.thatWritesTo(avroFileNameMock).thatWritesRecordsOf(avroSchemaMock).createNewWriter();
 
     thenConfiguredDestinationFileIsUsedInTheFinalWriterObject();
   }
@@ -178,7 +178,7 @@ public class DisruptorAvroFileWriterBuilderTest {
   public void whenTheSchemaIsValid_andAWriterIsBuilt_thenTheConfiguredIsSchemaUsedToBuildTheWriter() throws Exception {
     givenDestinationFileIsValid();
     
-    disruptorAvroFileWriterBuilderUnderTest.thatWritesTo(avroFileNameMock).thatWritesRecordsOf(avroSchemaMock).build();
+    disruptorAvroFileWriterBuilderUnderTest.thatWritesTo(avroFileNameMock).thatWritesRecordsOf(avroSchemaMock).createNewWriter();
 
     thenConfiguredSchemaIsUsedInTheFinalWriterObject();
   }
@@ -187,7 +187,7 @@ public class DisruptorAvroFileWriterBuilderTest {
   public void whenNoOptionalStepsAreCalled_thenDefaultsAreUsedToBuildTheWriter() throws Exception {
     final OptionalSteps disruptorAvroFileWriterBuilderUnderTest = givenABuilderWithMandatoryStepsConfigured();
 
-    disruptorAvroFileWriterBuilderUnderTest.build();
+    disruptorAvroFileWriterBuilderUnderTest.createNewWriter();
 
     thenDefaultsAreUsedInTheFinalWriterObject();
   }
@@ -196,7 +196,7 @@ public class DisruptorAvroFileWriterBuilderTest {
   public void whenTheRingBufferSizeIsConfigured_thenItIsUsedToBuildTheWriter() throws Exception {
     final OptionalSteps disruptorAvroFileWriterBuilderUnderTest = givenABuilderWithMandatoryStepsConfigured();
     
-    disruptorAvroFileWriterBuilderUnderTest.withRingBufferSize(Integer.MAX_VALUE).build();
+    disruptorAvroFileWriterBuilderUnderTest.withRingBufferSize(Integer.MAX_VALUE).createNewWriter();
 
     thenConfiguredBufferSizeIsUsedInTheFinalWriterObject();
   }
@@ -205,7 +205,7 @@ public class DisruptorAvroFileWriterBuilderTest {
   public void whenTheProducerTypeIsConfigured_thenItIsUsedToBuildTheWriter() throws Exception {
     final OptionalSteps disruptorAvroFileWriterBuilderUnderTest = givenABuilderWithMandatoryStepsConfigured();
     
-    disruptorAvroFileWriterBuilderUnderTest.withProducerType(producerTypeMock).build();
+    disruptorAvroFileWriterBuilderUnderTest.withProducerType(producerTypeMock).createNewWriter();
 
     thenConfiguredProducerTypeIsUsedInTheFinalWriterObject();
   }
@@ -215,7 +215,7 @@ public class DisruptorAvroFileWriterBuilderTest {
     final OptionalSteps disruptorAvroFileWriterBuilderUnderTest =
         givenABuilderWithMandatoryStepsConfigured();
 
-    disruptorAvroFileWriterBuilderUnderTest.withWaitStrategy(waitStrategyMock).build();
+    disruptorAvroFileWriterBuilderUnderTest.withWaitStrategy(waitStrategyMock).createNewWriter();
 
     thenConfiguredWriteStrategyIsUsedInTheFinalWriterObject();
   }
@@ -224,7 +224,7 @@ public class DisruptorAvroFileWriterBuilderTest {
   public void whenTheRollingPolicyIsConfigured_thenItIsUsedToBuildTheWriter() throws Exception {
     final OptionalSteps disruptorAvroFileWriterBuilderUnderTest = givenABuilderWithMandatoryStepsConfigured();
     
-    disruptorAvroFileWriterBuilderUnderTest.withRollingPolicy(rollingPolicyMock).build();
+    disruptorAvroFileWriterBuilderUnderTest.withRollingPolicy(rollingPolicyMock).createNewWriter();
 
     thenConfiguredRollingPolicyIsUsedInTheFinalWriterObject();
   }
@@ -233,7 +233,7 @@ public class DisruptorAvroFileWriterBuilderTest {
   public void whenTheWriterIsBuilt_thenExceptionsWithinDisruptorAreHandledWithADisruptorExceptionHandler() throws Exception {
     final OptionalSteps disruptorAvroFileWriterBuilderUnderTest = givenABuilderWithMandatoryStepsConfigured();
     
-    disruptorAvroFileWriterBuilderUnderTest.build();
+    disruptorAvroFileWriterBuilderUnderTest.createNewWriter();
     
     verify(disruptorMock).handleExceptionsWith(isA(DisruptorExceptionHandler.class));
   }
@@ -242,7 +242,7 @@ public class DisruptorAvroFileWriterBuilderTest {
   public void whenTheWriterIsBuilt_thenTheEventsConsumerExecutorIsRegisteredForShutdown() throws Exception {
     final OptionalSteps disruptorAvroFileWriterBuilderUnderTest = givenABuilderWithMandatoryStepsConfigured();
     
-    disruptorAvroFileWriterBuilderUnderTest.build();
+    disruptorAvroFileWriterBuilderUnderTest.createNewWriter();
     
     verify(avroEventPublisherMock).registerConsumerExecutorForShutdown(isA(ExecutorService.class));
   }

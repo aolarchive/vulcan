@@ -46,6 +46,6 @@ public interface OptionalSteps {
   /**
    * Finish configuration and create a new {@link DisruptorAvroFileWriter} instance
    */
-  DisruptorAvroFileWriter build();
+  DisruptorAvroFileWriter createNewWriter();
 
 }

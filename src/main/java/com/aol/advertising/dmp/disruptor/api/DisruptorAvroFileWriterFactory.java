@@ -22,13 +22,13 @@ public class DisruptorAvroFileWriterFactory {
   private RollingPolicy rollingPolicy;
   
   public DisruptorAvroFileWriter createNewWriter() {
-    return DisruptorAvroFileWriterBuilder.createNewWriter().thatWritesTo(avroFileName)
-                                                           .thatWritesRecordsOf(avroSchema)
-                                                           .withRingBufferSize(ringBufferSize)
-                                                           .withProducerType(producerType)
-                                                           .withWaitStrategy(waitStrategy)
-                                                           .withRollingPolicy(rollingPolicy)
-                                                           .build();
+    return DisruptorAvroFileWriterBuilder.startCreatingANewWriter().thatWritesTo(avroFileName)
+                                                                   .thatWritesRecordsOf(avroSchema)
+                                                                   .withRingBufferSize(ringBufferSize)
+                                                                   .withProducerType(producerType)
+                                                                   .withWaitStrategy(waitStrategy)
+                                                                   .withRollingPolicy(rollingPolicy)
+                                                                   .createNewWriter();
   }
 
 

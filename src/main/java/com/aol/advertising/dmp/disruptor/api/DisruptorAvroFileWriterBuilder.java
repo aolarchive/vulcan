@@ -59,7 +59,7 @@ public class DisruptorAvroFileWriterBuilder implements Steps {
   /**
    * Start creating a {@link DisruptorAvroFileWriter}
    */
-  public static AvroFileNameStep createNewWriter() {
+  public static AvroFileNameStep startCreatingANewWriter() {
     final DisruptorAvroFileWriterBuilder newBuilder = new DisruptorAvroFileWriterBuilder();
     newBuilder.useSensibleDefaults();
     return newBuilder;
@@ -177,7 +177,7 @@ public class DisruptorAvroFileWriterBuilder implements Steps {
   }
 
   @Override
-  public DisruptorAvroFileWriter build() {
+  public DisruptorAvroFileWriter createNewWriter() {
     publisherUnderConstruction.registerConsumerExecutorForShutdown(consumerExecutor);
     publisherUnderConstruction.startPublisherUsing(buildDisruptor());
     return publisherUnderConstruction;

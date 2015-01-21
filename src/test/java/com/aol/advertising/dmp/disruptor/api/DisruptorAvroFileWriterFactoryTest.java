@@ -39,7 +39,7 @@ public class DisruptorAvroFileWriterFactoryTest {
   @Before
   public void setUp() {
     mockStatic(DisruptorAvroFileWriterBuilder.class);
-    when(DisruptorAvroFileWriterBuilder.createNewWriter()).thenReturn(disruptorAvroFileWriterBuilderMock);
+    when(DisruptorAvroFileWriterBuilder.startCreatingANewWriter()).thenReturn(disruptorAvroFileWriterBuilderMock);
     when(disruptorAvroFileWriterBuilderMock.thatWritesTo(avroFileNameMock)).thenReturn(disruptorAvroFileWriterBuilderMock);
     when(disruptorAvroFileWriterBuilderMock.thatWritesRecordsOf(avroSchemaMock)).thenReturn(disruptorAvroFileWriterBuilderMock);
     when(disruptorAvroFileWriterBuilderMock.withRingBufferSize(BUFFER_SIZE)).thenReturn(disruptorAvroFileWriterBuilderMock);
@@ -74,7 +74,7 @@ public class DisruptorAvroFileWriterFactoryTest {
     verify(disruptorAvroFileWriterBuilderMock).withProducerType(producerTypeMock);
     verify(disruptorAvroFileWriterBuilderMock).withWaitStrategy(waitStrategyMock);
     verify(disruptorAvroFileWriterBuilderMock).withRollingPolicy(rollingPolicyMock);
-    verify(disruptorAvroFileWriterBuilderMock).build();
+    verify(disruptorAvroFileWriterBuilderMock).createNewWriter();
   }
 
 }
