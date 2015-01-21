@@ -118,8 +118,7 @@ class SizeBasedRollingCondition {
     @Override
     public boolean rolloverShouldHappen() throws IOException {
       if (predictedRollReached()) {
-        final long currentFileSize = Files.size(avroFileName);
-        return currentFileSize >= rolloverTriggeringSizeInBytes;
+        return Files.size(avroFileName) >= rolloverTriggeringSizeInBytes;
       }
       return false;
     }

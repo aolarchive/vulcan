@@ -28,6 +28,7 @@ import org.powermock.modules.junit4.PowerMockRunner;
 
 import com.aol.advertising.dmp.disruptor.api.builder.steps.AvroFileNameStep;
 import com.aol.advertising.dmp.disruptor.api.builder.steps.OptionalSteps;
+import com.aol.advertising.dmp.disruptor.exception.DisruptorExceptionHandler;
 import com.aol.advertising.dmp.disruptor.ringbuffer.AvroEvent;
 import com.aol.advertising.dmp.disruptor.ringbuffer.AvroEventFactory;
 import com.aol.advertising.dmp.disruptor.rolling.TimeAndSizeBasedRollingPolicy;
@@ -65,6 +66,8 @@ public class DisruptorAvroFileWriterBuilderTest {
   private AvroEventConsumer avroEventConsumerMock;
   @Mock
   private ProducerType producerTypeMock;
+  @Mock
+  private WaitStrategy waitStrategyMock;
   @Mock
   private RollingPolicy rollingPolicyMock;
 
@@ -195,7 +198,7 @@ public class DisruptorAvroFileWriterBuilderTest {
     
     disruptorAvroFileWriterBuilderUnderTest.withRingBufferSize(Integer.MAX_VALUE).build();
 
-    thenConfiguredBufferSizeIsUsedInTheFinalWriteObject();
+    thenConfiguredBufferSizeIsUsedInTheFinalWriterObject();
   }
 
   @Test
@@ -204,16 +207,44 @@ public class DisruptorAvroFileWriterBuilderTest {
     
     disruptorAvroFileWriterBuilderUnderTest.withProducerType(producerTypeMock).build();
 
-    thenConfiguredProducerTypeIsUsedInTheFinalWriteObject();
+    thenConfiguredProducerTypeIsUsedInTheFinalWriterObject();
   }
   
+  @Test
+  public void whenTheWaitStrategyIsConfigured_thenItIsUsedToBuildTheWriter() throws Exception {
+    final OptionalSteps disruptorAvroFileWriterBuilderUnderTest =
+        givenABuilderWithMandatoryStepsConfigured();
+
+    disruptorAvroFileWriterBuilderUnderTest.withWaitStrategy(waitStrategyMock).build();
+
+    thenConfiguredWriteStrategyIsUsedInTheFinalWriterObject();
+  }
+
   @Test
   public void whenTheRollingPolicyIsConfigured_thenItIsUsedToBuildTheWriter() throws Exception {
     final OptionalSteps disruptorAvroFileWriterBuilderUnderTest = givenABuilderWithMandatoryStepsConfigured();
     
     disruptorAvroFileWriterBuilderUnderTest.withRollingPolicy(rollingPolicyMock).build();
 
-    thenConfiguredRollingPolicyIsUsedInTheFinalWriteObject();
+    thenConfiguredRollingPolicyIsUsedInTheFinalWriterObject();
+  }
+
+  @Test
+  public void whenTheWriterIsBuilt_thenExceptionsWithinDisruptorAreHandledWithADisruptorExceptionHandler() throws Exception {
+    final OptionalSteps disruptorAvroFileWriterBuilderUnderTest = givenABuilderWithMandatoryStepsConfigured();
+    
+    disruptorAvroFileWriterBuilderUnderTest.build();
+    
+    verify(disruptorMock).handleExceptionsWith(isA(DisruptorExceptionHandler.class));
+  }
+  
+  @Test
+  public void whenTheWriterIsBuilt_thenTheEventsConsumerExecutorIsRegisteredForShutdown() throws Exception {
+    final OptionalSteps disruptorAvroFileWriterBuilderUnderTest = givenABuilderWithMandatoryStepsConfigured();
+    
+    disruptorAvroFileWriterBuilderUnderTest.build();
+    
+    verify(avroEventPublisherMock).registerConsumerExecutorForShutdown(isA(ExecutorService.class));
   }
 
   private void givenDestinationFileIsADirectory() {
@@ -288,20 +319,26 @@ public class DisruptorAvroFileWriterBuilderTest {
                                              eq(ProducerType.MULTI), isA(SleepingWaitStrategy.class));
   }
   
-  private void thenConfiguredBufferSizeIsUsedInTheFinalWriteObject() throws Exception {
+  private void thenConfiguredBufferSizeIsUsedInTheFinalWriterObject() throws Exception {
     verifyNew(Disruptor.class).withArguments(any(AvroEventFactory.class), eq(Integer.MAX_VALUE), any(ExecutorService.class),
                                              any(ProducerType.class), any(WaitStrategy.class));
     verify(avroEventPublisherMock).startPublisherUsing(disruptorMock);
   }
   
-  private void thenConfiguredProducerTypeIsUsedInTheFinalWriteObject() throws Exception {
+  private void thenConfiguredProducerTypeIsUsedInTheFinalWriterObject() throws Exception {
     verifyNew(Disruptor.class).withArguments(any(AvroEventFactory.class), anyInt(), any(ExecutorService.class),
                                              eq(producerTypeMock), any(WaitStrategy.class));
     verify(avroEventPublisherMock).startPublisherUsing(disruptorMock);
   }
   
+  private void thenConfiguredWriteStrategyIsUsedInTheFinalWriterObject() throws Exception {
+    verifyNew(Disruptor.class).withArguments(any(AvroEventFactory.class), anyInt(),
+                                             any(ExecutorService.class), any(ProducerType.class), eq(waitStrategyMock));
+    verify(avroEventPublisherMock).startPublisherUsing(disruptorMock);
+  }
+
   @SuppressWarnings("unchecked")
-  private void thenConfiguredRollingPolicyIsUsedInTheFinalWriteObject() throws Exception {
+  private void thenConfiguredRollingPolicyIsUsedInTheFinalWriterObject() throws Exception {
     verifyNew(AvroEventConsumer.class).withArguments(any(Path.class), any(Schema.class), eq(rollingPolicyMock));
     verify(disruptorMock).handleEventsWith(avroEventConsumerMock);
     verify(avroEventPublisherMock).startPublisherUsing(disruptorMock);
