@@ -4,6 +4,7 @@ import java.nio.file.Path;
 
 import org.apache.avro.Schema;
 
+import com.aol.advertising.dmp.disruptor.api.builder.steps.OptionalSteps;
 import com.lmax.disruptor.WaitStrategy;
 import com.lmax.disruptor.dsl.ProducerType;
 
@@ -22,13 +23,22 @@ public class DisruptorAvroFileWriterFactory {
   private RollingPolicy rollingPolicy;
   
   public DisruptorAvroFileWriter createNewWriter() {
-    return DisruptorAvroFileWriterBuilder.startCreatingANewWriter().thatWritesTo(avroFileName)
-                                                                   .thatWritesRecordsOf(avroSchema)
-                                                                   .withRingBufferSize(ringBufferSize)
-                                                                   .withProducerType(producerType)
-                                                                   .withWaitStrategy(waitStrategy)
-                                                                   .withRollingPolicy(rollingPolicy)
-                                                                   .createNewWriter();
+    final OptionalSteps writerBuilder = DisruptorAvroFileWriterBuilder.startCreatingANewWriter()
+                                                                      .thatWritesTo(avroFileName)
+                                                                      .thatWritesRecordsOf(avroSchema);
+    if (ringBufferSize > 0) {
+      writerBuilder.withRingBufferSize(ringBufferSize);
+    }
+    if (producerType != null) {
+      writerBuilder.withProducerType(producerType);
+    }
+    if (waitStrategy != null) {
+      writerBuilder.withWaitStrategy(waitStrategy);
+    }
+    if (rollingPolicy != null) {
+      writerBuilder.withRollingPolicy(rollingPolicy);
+    }
+    return writerBuilder.createNewWriter();                                                  
   }
 
 
