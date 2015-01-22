@@ -14,7 +14,7 @@ public interface OptionalSteps {
    * memory usage depends on the actual size of the Avro entries used. <b>This number should be a
    * power of 2</b>
    * <p>
-   * Default is 1024 entries
+   * Default is 2048 entries
    */
   OptionalSteps withRingBufferSize(int ringBufferSize);
 
