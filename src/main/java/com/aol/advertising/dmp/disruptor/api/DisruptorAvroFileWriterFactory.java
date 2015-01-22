@@ -38,7 +38,7 @@ public class DisruptorAvroFileWriterFactory {
     if (rollingPolicy != null) {
       writerBuilder.withRollingPolicy(rollingPolicy);
     }
-    return writerBuilder.createNewWriter();                                                  
+    return writerBuilder.createNewWriter();
   }
 
 
