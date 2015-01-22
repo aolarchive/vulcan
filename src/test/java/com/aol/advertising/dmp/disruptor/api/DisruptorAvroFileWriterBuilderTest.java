@@ -315,7 +315,7 @@ public class DisruptorAvroFileWriterBuilderTest {
   }
   
   private void verifyDisruptorDefaults() throws Exception {
-    verifyNew(Disruptor.class).withArguments(any(AvroEventFactory.class), eq(1024), any(ExecutorService.class),
+    verifyNew(Disruptor.class).withArguments(any(AvroEventFactory.class), eq(2048), any(ExecutorService.class),
                                              eq(ProducerType.MULTI), isA(SleepingWaitStrategy.class));
   }
   
