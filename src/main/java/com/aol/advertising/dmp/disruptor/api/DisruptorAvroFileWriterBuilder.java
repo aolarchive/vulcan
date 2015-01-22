@@ -66,7 +66,7 @@ public class DisruptorAvroFileWriterBuilder implements Steps {
   }
 
   private void useSensibleDefaults() {
-    ringBufferSize = 2048;;
+    ringBufferSize = 2048;
     producerType = ProducerType.MULTI;
     waitStrategy = new SleepingWaitStrategy();
   }
