@@ -40,8 +40,9 @@ import com.lmax.disruptor.dsl.ProducerType;
 public class DisruptorAvroFileWriterBuilder implements Steps {
 
   private static final Logger log = LoggerFactory.getLogger(DisruptorAvroFileWriterBuilder.class);
-  private static final AvroEventFactory avroEventFactory = new AvroEventFactory();
-  private static final ExecutorService consumerExecutor = Executors.newSingleThreadExecutor();
+
+  private final AvroEventFactory avroEventFactory = new AvroEventFactory();
+  private final ExecutorService consumerExecutor = Executors.newSingleThreadExecutor();
 
   private AvroEventPublisher publisherUnderConstruction;
   
