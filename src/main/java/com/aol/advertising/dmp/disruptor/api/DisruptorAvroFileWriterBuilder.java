@@ -41,10 +41,10 @@ public class DisruptorAvroFileWriterBuilder implements Steps {
 
   private static final Logger log = LoggerFactory.getLogger(DisruptorAvroFileWriterBuilder.class);
 
-  private final AvroEventFactory avroEventFactory = new AvroEventFactory();
-  private final ExecutorService consumerExecutor = Executors.newSingleThreadExecutor();
+  private static final AvroEventFactory avroEventFactory = new AvroEventFactory();
 
-  private AvroEventPublisher publisherUnderConstruction;
+  private final ExecutorService consumerExecutor;
+  private final AvroEventPublisher publisherUnderConstruction;
   
   private Path avroFileName;
   private Schema avroSchema;
@@ -55,6 +55,7 @@ public class DisruptorAvroFileWriterBuilder implements Steps {
 
   private DisruptorAvroFileWriterBuilder() {
     publisherUnderConstruction = new AvroEventPublisher();
+    consumerExecutor = Executors.newSingleThreadExecutor();
   }
 
   /**
