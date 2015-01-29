@@ -12,6 +12,7 @@ import org.apache.avro.specific.SpecificDatumWriter;
 import org.apache.avro.specific.SpecificRecord;
 
 import com.aol.advertising.dmp.disruptor.api.RollingPolicy;
+import com.aol.advertising.dmp.disruptor.exception.FileRollingException;
 import com.aol.advertising.dmp.disruptor.ringbuffer.AvroEvent;
 import com.aol.advertising.dmp.disruptor.utils.FilesOpsFacade;
 import com.lmax.disruptor.EventHandler;
@@ -124,7 +125,7 @@ public class AvroEventConsumer implements EventHandler<AvroEvent>, LifecycleAwar
     try {
       FilesOpsFacade.facadeInstance.move(avroFileName, nextRolledFileName, StandardCopyOption.REPLACE_EXISTING);
     } catch (IOException e) {
-      throw new RuntimeException("File \"" + nextRolledFileName + "\" could not be used to roll the current output Avro file");
+      throw new FileRollingException("File \"" + nextRolledFileName + "\" could not be used to roll the current output Avro file");
     }
   }
 

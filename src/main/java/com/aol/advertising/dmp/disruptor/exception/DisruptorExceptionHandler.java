@@ -11,7 +11,7 @@ public class DisruptorExceptionHandler implements ExceptionHandler {
 
   @Override
   public void handleEventException(final Throwable ex, long _, final Object event) {
-    log.error("Could not write record\n{}\ndue to", event, ex);
+    log.error("Error while handling event\n{}\ndue to", event, ex);
   }
 
   @Override
