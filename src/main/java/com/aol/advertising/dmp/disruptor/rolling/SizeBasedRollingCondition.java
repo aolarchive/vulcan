@@ -51,9 +51,9 @@ class SizeBasedRollingCondition {
     }
   }
 
-  void signalFiledRolledTo(final Path rolledFileName) {
+  void signalRollover() {
     try {
-      delegateImplementation.signalFiledRolledTo(rolledFileName);
+      delegateImplementation.signalRollover();
     } catch (IOException ioe) {
       throw new RuntimeException(ioe);
     }
@@ -61,7 +61,8 @@ class SizeBasedRollingCondition {
 
   private interface RolloverShouldHappen {
     boolean rolloverShouldHappen() throws IOException;
-    void signalFiledRolledTo(final Path rolledFileName) throws IOException;
+
+    void signalRollover() throws IOException;
   }
 
   private class EMAWarmupPeriod implements RolloverShouldHappen {
@@ -90,7 +91,7 @@ class SizeBasedRollingCondition {
     }
 
     @Override
-    public void signalFiledRolledTo(final Path _) {
+    public void signalRollover() {
       initialFileSize = 0;
       recordsInCurrentFile = 0;
     }
@@ -124,8 +125,8 @@ class SizeBasedRollingCondition {
     }
 
     @Override
-    public void signalFiledRolledTo(final Path rolledFileName) throws IOException {
-      updateWriteRate(Files.size(rolledFileName));
+    public void signalRollover() throws IOException {
+      updateWriteRate(Files.size(avroFileName));
       recordsInCurrentFile = 0;
     }
 

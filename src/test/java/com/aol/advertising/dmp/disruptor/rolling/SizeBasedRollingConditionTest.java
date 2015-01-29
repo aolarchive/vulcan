@@ -30,8 +30,6 @@ public class SizeBasedRollingConditionTest {
   @Mock
   private Path avroFileNameMock;
   @Mock
-  private Path rolledFileMock;
-  @Mock
   private SizeBasedRollingCondition sizeBasedRollingConditionMock;
 
   @Before
@@ -58,9 +56,7 @@ public class SizeBasedRollingConditionTest {
       
       if (sizeBasedRollingConditionUnderTest.rolloverShouldHappen()) {
         numberOfRollsDetectedByCondition++;
-        long currentFileSize = Files.size(avroFileNameMock);
-        when(Files.size(rolledFileMock)).thenReturn(currentFileSize);
-        sizeBasedRollingConditionUnderTest.signalFiledRolledTo(rolledFileMock);
+        sizeBasedRollingConditionUnderTest.signalRollover();
       }
     }
 

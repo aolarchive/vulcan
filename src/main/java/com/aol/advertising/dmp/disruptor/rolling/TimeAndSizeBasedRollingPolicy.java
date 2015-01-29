@@ -41,7 +41,7 @@ public class TimeAndSizeBasedRollingPolicy implements RollingPolicy {
   private final SizeBasedRollingCondition sizeBasedRollingCondition;
   private final Path avroFileName;
 
-  private int currentRollingIndex;
+  private int nextRollingIndex;
 
   public TimeAndSizeBasedRollingPolicy(int rolloverTriggeringSizeInMB, final Path avroFileName) {
     this.timeBasedRollingCondition = new TimeBasedRollingCondition();
@@ -59,30 +59,28 @@ public class TimeAndSizeBasedRollingPolicy implements RollingPolicy {
   @Override
   // Format: <path_to_file><file_name_minus_extension>-yyyy-MM-dd.index.log
   public Path getNextRolledFileName(final Path _) {
-    return Paths.get(avroFileName.getParent().toString(), avroFileName.getFileSystem().getSeparator()
+    resetRollingIndexIfTimeConditionIsHit();
+    final Path nextRolledFileName = Paths.get(avroFileName.getParent().toString(), avroFileName.getFileSystem().getSeparator()
                                                           + removeFileExtensionFrom(avroFileName)
                                                           + "-"
                                                           + dateTimeFormatterForRolledFiles.print(DateTime.now())
                                                           + "."
-                                                          + currentRollingIndex
+                                                          + nextRollingIndex
                                                           + ".log");
+    nextRollingIndex++;
+    signalRolloverToConditions();
+    return nextRolledFileName;
   }
-
-
-  @Override
-  public void signalRolloverOf(final Path _) {
-    final Path rolledFileName = getNextRolledFileName(avroFileName);
-    updateCurrentRollingIndex();
-    timeBasedRollingCondition.signalRollover();
-    sizeBasedRollingCondition.signalFiledRolledTo(rolledFileName);
-  }
-
-  private void updateCurrentRollingIndex() {
+  
+  private void resetRollingIndexIfTimeConditionIsHit() {
     if (timeBasedRollingCondition.rolloverShouldHappen()) {
-      currentRollingIndex = 0;
-    } else {
-      currentRollingIndex++;
+      nextRollingIndex = 0;
     }
+  }
+
+  private void signalRolloverToConditions() {
+    timeBasedRollingCondition.signalRollover();
+    sizeBasedRollingCondition.signalRollover();
   }
 
   private void init() {
@@ -94,7 +92,7 @@ public class TimeAndSizeBasedRollingPolicy implements RollingPolicy {
   }
 
   private void determineInitialRollingIndex() throws IOException {
-    currentRollingIndex = getHighestIndexFromArchivedFilesInDir() + 1;
+    nextRollingIndex = getHighestIndexFromArchivedFilesInDir() + 1;
   }
 
   private int getHighestIndexFromArchivedFilesInDir() throws IOException {

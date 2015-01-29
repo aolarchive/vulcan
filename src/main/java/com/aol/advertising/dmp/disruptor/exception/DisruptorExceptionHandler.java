@@ -10,8 +10,8 @@ public class DisruptorExceptionHandler implements ExceptionHandler {
   private static final Logger log = LoggerFactory.getLogger(DisruptorExceptionHandler.class);
 
   @Override
-  public void handleEventException(final Throwable ex, long sequence, final Object event) {
-    log.warn("Could not write record\n{}\ndue to", event, ex);
+  public void handleEventException(final Throwable ex, long _, final Object event) {
+    log.error("Could not write record\n{}\ndue to", event, ex);
   }
 
   @Override
@@ -21,7 +21,7 @@ public class DisruptorExceptionHandler implements ExceptionHandler {
 
   @Override
   public void handleOnShutdownException(final Throwable ex) {
-    log.warn("Exception while shutting down events consumer", ex);
+    log.error("Exception while shutting down events consumer", ex);
   }
 
 }

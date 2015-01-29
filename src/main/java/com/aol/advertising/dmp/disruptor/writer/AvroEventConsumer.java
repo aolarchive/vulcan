@@ -1,7 +1,6 @@
 package com.aol.advertising.dmp.disruptor.writer;
 
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 
@@ -14,6 +13,7 @@ import org.apache.avro.specific.SpecificRecord;
 
 import com.aol.advertising.dmp.disruptor.api.RollingPolicy;
 import com.aol.advertising.dmp.disruptor.ringbuffer.AvroEvent;
+import com.aol.advertising.dmp.disruptor.utils.FilesOpsFacade;
 import com.lmax.disruptor.EventHandler;
 import com.lmax.disruptor.LifecycleAware;
 
@@ -78,7 +78,7 @@ public class AvroEventConsumer implements EventHandler<AvroEvent>, LifecycleAwar
   }
 
   private void bindWriterToAvroFile() throws IOException {
-    if (Files.exists(avroFileName)) {
+    if (FilesOpsFacade.facadeInstance.exists(avroFileName)) {
       ensureBindingToAFileWithConfiguredSchema();
     } else {
       avroFileWriter.create(avroSchema, avroFileName.toFile());
@@ -111,16 +111,18 @@ public class AvroEventConsumer implements EventHandler<AvroEvent>, LifecycleAwar
   }
 
   private void rollFile() throws IOException {
-    avroFileWriter.close();
-    renameAvroFile();
-    rollingPolicy.signalRolloverOf(avroFileName);
-    rewireWriter();
+    try {
+      avroFileWriter.close();
+      renameAvroFile();
+    } finally {
+      rewireWriter();
+    }
   }
 
   private void renameAvroFile() {
     final Path nextRolledFileName = rollingPolicy.getNextRolledFileName(avroFileName);
     try {
-      Files.move(avroFileName, nextRolledFileName, StandardCopyOption.REPLACE_EXISTING);
+      FilesOpsFacade.facadeInstance.move(avroFileName, nextRolledFileName, StandardCopyOption.REPLACE_EXISTING);
     } catch (IOException e) {
       throw new RuntimeException("File \"" + nextRolledFileName + "\" could not be used to roll the current output Avro file");
     }
@@ -128,7 +130,10 @@ public class AvroEventConsumer implements EventHandler<AvroEvent>, LifecycleAwar
 
   private void rewireWriter() throws IOException {
     getNewFileWriter();
-    avroFileWriter.create(avroSchema, avroFileName.toFile());
+    if (FilesOpsFacade.facadeInstance.exists(avroFileName)) {
+      avroFileWriter.appendTo(avroFileName.toFile());
+    } else {
+      avroFileWriter.create(avroSchema, avroFileName.toFile());
+    }
   }
-
 }

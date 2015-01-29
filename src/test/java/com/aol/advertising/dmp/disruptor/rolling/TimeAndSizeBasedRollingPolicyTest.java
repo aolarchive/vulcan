@@ -26,7 +26,6 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
-import org.powermock.reflect.Whitebox;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({Files.class, TimeBasedRollingCondition.class, SizeBasedRollingCondition.class, TimeAndSizeBasedRollingPolicy.class})
@@ -102,34 +101,31 @@ public class TimeAndSizeBasedRollingPolicyTest {
   }
 
   @Test
-  public void whenARolloverIsSignaled_thenInfoAboutTheEventIsPropagatedToConditions() {
+  public void whenTheNextRolledFileNameIsRetrieved_thenInfoAboutARolloverEventIsPropagatedToConditions() {
     givenThePolicyIsInitialized();
-    final Path nextRolledFileName = timeAndSizeBasedRollingPolicyUnderTest.getNextRolledFileName(null);
 
-    timeAndSizeBasedRollingPolicyUnderTest.signalRolloverOf(null);
+    timeAndSizeBasedRollingPolicyUnderTest.getNextRolledFileName(null);
 
-    thenInfoAboutTheEventIsPropagatedToConditions(nextRolledFileName);
+    thenInfoAboutTheEventIsPropagatedToConditions();
   }
   
   @Test
-  public void whenATimeBasedBasedRolloverIsSignaled_thenTheIndexOfTheRolledFileNameIsResetToZero() {
+  public void whenTheNextRolledFileNameIsRetrieved_andATimeBasedRollIsDue_thenTheIndexOfTheRolledFileNameIsResetToZero() {
     givenThePolicyIsInitialized();
     givenTimeBasedRollIsDue();
 
-    timeAndSizeBasedRollingPolicyUnderTest.signalRolloverOf(null);
-    
     final int index = getIndexFrom(timeAndSizeBasedRollingPolicyUnderTest.getNextRolledFileName(null));
+
     assertThat(index, is(equalTo(0)));
   }
   
   @Test
-  public void whenANonTimeBasedBasedRolloverIsSignaled_thenTheIndexOfTheRolledFileNameIsIncreasedByOne() {
+  public void whenTheNextRolledFileNameIsRetrieved_andTimeBasedRollIsNotDue_thenTheIndexOfTheRolledFileNameIsIncreasedByOne() {
     givenThePolicyIsInitialized();
     final int initialIndex = getIndexFrom(timeAndSizeBasedRollingPolicyUnderTest.getNextRolledFileName(null));
 
-    timeAndSizeBasedRollingPolicyUnderTest.signalRolloverOf(null);
-    
     final int finalIndex = getIndexFrom(timeAndSizeBasedRollingPolicyUnderTest.getNextRolledFileName(null));
+    
     assertThat(finalIndex, is(equalTo(initialIndex + 1)));
   }
 
@@ -149,7 +145,8 @@ public class TimeAndSizeBasedRollingPolicyTest {
   }
   
   private void thenTheRollingIndexContinuesWhereWeLeftOff(TimeAndSizeBasedRollingPolicy timeAndSizeBasedRollingPolicyUnderTest) {
-    assertThat(Whitebox.getInternalState(timeAndSizeBasedRollingPolicyUnderTest, int.class), is(equalTo(20 + 1)));
+    final int nextIndex = getIndexFrom(timeAndSizeBasedRollingPolicyUnderTest.getNextRolledFileName(null));
+    assertThat(nextIndex, is(equalTo(20 + 1)));
   }
 
   private void thenDecisionIsDelegatedToConditions() {
@@ -161,9 +158,9 @@ public class TimeAndSizeBasedRollingPolicyTest {
     assertThat(generatedName, matchesRegex("[a-zA-Z/]+-\\d{4}-\\d{2}-\\d{2}\\.\\d+\\.log"));
   }
 
-  private void thenInfoAboutTheEventIsPropagatedToConditions(Path nextRolledFileName) {
+  private void thenInfoAboutTheEventIsPropagatedToConditions() {
     verify(timeBasedRollingConditionMock).signalRollover();
-    verify(sizeBasedRollingConditionMock).signalFiledRolledTo(nextRolledFileName);
+    verify(sizeBasedRollingConditionMock).signalRollover();
   }
 
   private static Matcher<Path> matchesRegex(final String regex) {
