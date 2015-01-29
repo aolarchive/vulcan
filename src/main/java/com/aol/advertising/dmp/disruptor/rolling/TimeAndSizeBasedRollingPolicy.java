@@ -72,14 +72,6 @@ public class TimeAndSizeBasedRollingPolicy implements RollingPolicy {
     signalRolloverToConditions();
     return nextRolledFileName;
   }
-  
-  private void chooseNextIndexToUse() {
-    if (timeBasedRollingCondition.lastRolloverHappenedBeforeToday()) {
-      nextRollingIndex = 0;
-    } else {
-      nextRollingIndex++;
-    }
-  }
 
   private DateTime chooseNextDateTimeToUse() {
     if (timeBasedRollingCondition.lastRolloverHappenedBeforeToday()) {
@@ -91,6 +83,14 @@ public class TimeAndSizeBasedRollingPolicy implements RollingPolicy {
 
   private DateTime yesterday() {
     return DateTime.now().minusDays(1);
+  }
+
+  private void chooseNextIndexToUse() {
+    if (timeBasedRollingCondition.lastRolloverHappenedBeforeToday()) {
+      nextRollingIndex = 0;
+    } else {
+      nextRollingIndex++;
+    }
   }
 
   private void signalRolloverToConditions() {
