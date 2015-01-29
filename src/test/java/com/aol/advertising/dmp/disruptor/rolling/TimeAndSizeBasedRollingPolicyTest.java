@@ -18,6 +18,7 @@ import java.util.regex.Pattern;
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeMatcher;
+import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -99,20 +100,31 @@ public class TimeAndSizeBasedRollingPolicyTest {
 
     thenObtainedNameFollowsTheExpectedPattern(generatedName);
   }
-
+  
   @Test
-  public void whenTheNextRolledFileNameIsRetrieved_thenInfoAboutARolloverEventIsPropagatedToConditions() {
+  public void whenTheNextRolledFileNameIsRetrieved_andTimeBasedRollIsDue_thenRolledFileNameDateIsYesterday() {
     givenThePolicyIsInitialized();
-
-    timeAndSizeBasedRollingPolicyUnderTest.getNextRolledFileName(null);
-
-    thenInfoAboutTheEventIsPropagatedToConditions();
+    givenTimeBasedRollIsDue();
+    
+    final DateTime date = getDateTimeFrom(timeAndSizeBasedRollingPolicyUnderTest.getNextRolledFileName(null));
+    
+    assertThat(date, is(equalTo(DateTime.now().minusDays(1).withTimeAtStartOfDay())));
   }
   
   @Test
-  public void whenTheNextRolledFileNameIsRetrieved_andATimeBasedRollIsDue_thenTheIndexOfTheRolledFileNameIsResetToZero() {
+  public void whenTheNextRolledFileNameIsRetrieved_andTimeBasedRollIsNotDue_thenRolledFileNameDateIsToday() {
+    givenThePolicyIsInitialized();
+    
+    final DateTime date = getDateTimeFrom(timeAndSizeBasedRollingPolicyUnderTest.getNextRolledFileName(null));
+    
+    assertThat(date, is(equalTo(DateTime.now().withTimeAtStartOfDay())));
+  }
+
+  @Test
+  public void whenTheNextRolledFileNameIsRetrieved_andTimeBasedRollIsDue_thenTheIndexOfTheRolledFileNameIsResetToZeroInTheNextCall() {
     givenThePolicyIsInitialized();
     givenTimeBasedRollIsDue();
+    givenFiledHasBeenRolledBefore();
 
     final int index = getIndexFrom(timeAndSizeBasedRollingPolicyUnderTest.getNextRolledFileName(null));
 
@@ -129,6 +141,15 @@ public class TimeAndSizeBasedRollingPolicyTest {
     assertThat(finalIndex, is(equalTo(initialIndex + 1)));
   }
 
+  @Test
+  public void whenTheNextRolledFileNameIsRetrieved_thenInfoAboutARolloverEventIsPropagatedToConditions() {
+    givenThePolicyIsInitialized();
+
+    timeAndSizeBasedRollingPolicyUnderTest.getNextRolledFileName(null);
+
+    thenInfoAboutTheEventIsPropagatedToConditions();
+  }
+
   private void givenTheMaximumIndexInTheDirIs20() {
     when(dirContentsIteratorMock.hasNext()).thenReturn(true, true, true, false);
     when(dirContentsIteratorMock.next()).thenReturn(Paths.get("blah.blop"),
@@ -141,17 +162,21 @@ public class TimeAndSizeBasedRollingPolicyTest {
   }
   
   private void givenTimeBasedRollIsDue() {
-    when(timeBasedRollingConditionMock.rolloverShouldHappen()).thenReturn(true);
+    when(timeBasedRollingConditionMock.lastRolloverHappenedBeforeToday()).thenReturn(true);
   }
   
+  private void givenFiledHasBeenRolledBefore() {
+    timeAndSizeBasedRollingPolicyUnderTest.getNextRolledFileName(null);
+  }
+
   private void thenTheRollingIndexContinuesWhereWeLeftOff(TimeAndSizeBasedRollingPolicy timeAndSizeBasedRollingPolicyUnderTest) {
     final int nextIndex = getIndexFrom(timeAndSizeBasedRollingPolicyUnderTest.getNextRolledFileName(null));
     assertThat(nextIndex, is(equalTo(20 + 1)));
   }
 
   private void thenDecisionIsDelegatedToConditions() {
-    verify(timeBasedRollingConditionMock).rolloverShouldHappen();
-    verify(sizeBasedRollingConditionMock).rolloverShouldHappen();
+    verify(timeBasedRollingConditionMock).lastRolloverHappenedBeforeToday();
+    verify(sizeBasedRollingConditionMock).sizeThresholdHasBeenHit();
   }
   
   private void thenObtainedNameFollowsTheExpectedPattern(final Path generatedName) {
@@ -179,10 +204,16 @@ public class TimeAndSizeBasedRollingPolicyTest {
     };
   }
   
+  private DateTime getDateTimeFrom(final Path fileName) {
+    final java.util.regex.Matcher dateTimeMatcher = Pattern.compile(avroFileNameMock.getFileName().toString()
+                                                                    + ".+(\\d{4}-\\d{2}-\\d{2})\\.\\d+\\.log$")
+                                                           .matcher(fileName.getFileName().toString());
+    return dateTimeMatcher.find() ? DateTime.parse(dateTimeMatcher.group(1)) : new DateTime(0);
+  }
+
   private int getIndexFrom(final Path fileName) {
     final java.util.regex.Matcher fileIndexMatcher = Pattern.compile(avroFileNameMock.getFileName().toString()
                                                                      + ".+\\d{2}\\.(\\d+)").matcher(fileName.getFileName().toString());
     return fileIndexMatcher.find() ? Integer.parseInt(fileIndexMatcher.group(1)) : Integer.MIN_VALUE;
   }
-
 }

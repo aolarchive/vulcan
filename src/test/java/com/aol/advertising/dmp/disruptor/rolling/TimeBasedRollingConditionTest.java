@@ -56,7 +56,7 @@ public class TimeBasedRollingConditionTest {
   public void whenLastRollHappenedBeforeToday_thenRolloverShouldHappen() {
     givenLastRollHappenedBeforeToday();
 
-    final boolean rolloverShouldHappen = timeBasedRollingConditionUnderTest.rolloverShouldHappen();
+    final boolean rolloverShouldHappen = timeBasedRollingConditionUnderTest.lastRolloverHappenedBeforeToday();
 
     assertThat(rolloverShouldHappen, is(equalTo(true)));
   }

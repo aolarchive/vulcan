@@ -43,9 +43,9 @@ class SizeBasedRollingCondition {
     }
   }
 
-  boolean rolloverShouldHappen() {
+  boolean sizeThresholdHasBeenHit() {
     try {
-      return delegateImplementation.rolloverShouldHappen();
+      return delegateImplementation.sizeThresholdHasBeenHit();
     } catch (IOException ioe) {
       throw new RuntimeException(ioe);
     }
@@ -60,8 +60,7 @@ class SizeBasedRollingCondition {
   }
 
   private interface RolloverShouldHappen {
-    boolean rolloverShouldHappen() throws IOException;
-
+    boolean sizeThresholdHasBeenHit() throws IOException;
     void signalRollover() throws IOException;
   }
 
@@ -77,7 +76,7 @@ class SizeBasedRollingCondition {
     }
 
     @Override
-    public boolean rolloverShouldHappen() throws IOException {
+    public boolean sizeThresholdHasBeenHit() throws IOException {
       if ((++recordsInCurrentFile % FIXED_SIZE_CHECK_RATE) == 0) {
         final long currentFileSize = Files.size(avroFileName);
         if (recordsHaveBeenWrittenToDisk(currentFileSize)) {
@@ -117,7 +116,7 @@ class SizeBasedRollingCondition {
   private class EMAReady implements RolloverShouldHappen {
 
     @Override
-    public boolean rolloverShouldHappen() throws IOException {
+    public boolean sizeThresholdHasBeenHit() throws IOException {
       if (predictedRollReached()) {
         return Files.size(avroFileName) >= rolloverTriggeringSizeInBytes;
       }

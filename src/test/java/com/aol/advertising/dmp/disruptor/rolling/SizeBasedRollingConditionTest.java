@@ -54,7 +54,7 @@ public class SizeBasedRollingConditionTest {
       final int eventsInRolledFiles = NUMBER_OF_EVENTS_PER_ROLLED_FILE * numberOfRollsDetectedByCondition;
       when(Files.size(avroFileNameMock)).thenReturn((long) (numberOfWrittenEventsSoFar - eventsInRolledFiles) * BYTES_TO_EVENT_RATIO);
       
-      if (sizeBasedRollingConditionUnderTest.rolloverShouldHappen()) {
+      if (sizeBasedRollingConditionUnderTest.sizeThresholdHasBeenHit()) {
         numberOfRollsDetectedByCondition++;
         sizeBasedRollingConditionUnderTest.signalRollover();
       }

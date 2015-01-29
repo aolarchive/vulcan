@@ -53,29 +53,44 @@ public class TimeAndSizeBasedRollingPolicy implements RollingPolicy {
 
   @Override
   public boolean shouldRollover(final Path _, final SpecificRecord avroRecord) {
-    return timeBasedRollingCondition.rolloverShouldHappen() || sizeBasedRollingCondition.rolloverShouldHappen();
+    return timeBasedRollingCondition.lastRolloverHappenedBeforeToday() || sizeBasedRollingCondition.sizeThresholdHasBeenHit();
   }
 
   @Override
   // Format: <path_to_file><file_name_minus_extension>-yyyy-MM-dd.index.log
   public Path getNextRolledFileName(final Path _) {
-    resetRollingIndexIfTimeConditionIsHit();
+    final DateTime nextDateTimeToUse = chooseNextDateTimeToUse();
+
     final Path nextRolledFileName = Paths.get(avroFileName.getParent().toString(), avroFileName.getFileSystem().getSeparator()
                                                           + removeFileExtensionFrom(avroFileName)
                                                           + "-"
-                                                          + dateTimeFormatterForRolledFiles.print(DateTime.now())
+                                                          + dateTimeFormatterForRolledFiles.print(nextDateTimeToUse)
                                                           + "."
                                                           + nextRollingIndex
                                                           + ".log");
-    nextRollingIndex++;
+    chooseNextIndexToUse();
     signalRolloverToConditions();
     return nextRolledFileName;
   }
   
-  private void resetRollingIndexIfTimeConditionIsHit() {
-    if (timeBasedRollingCondition.rolloverShouldHappen()) {
+  private void chooseNextIndexToUse() {
+    if (timeBasedRollingCondition.lastRolloverHappenedBeforeToday()) {
       nextRollingIndex = 0;
+    } else {
+      nextRollingIndex++;
     }
+  }
+
+  private DateTime chooseNextDateTimeToUse() {
+    if (timeBasedRollingCondition.lastRolloverHappenedBeforeToday()) {
+      return yesterday();
+    } else {
+      return DateTime.now();
+    }
+  }
+
+  private DateTime yesterday() {
+    return DateTime.now().minusDays(1);
   }
 
   private void signalRolloverToConditions() {
