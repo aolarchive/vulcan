@@ -41,7 +41,7 @@ public class TimeAndSizeBasedRollingPolicy implements RollingPolicy {
   private final SizeBasedRollingCondition sizeBasedRollingCondition;
   private final Path avroFileName;
 
-  private int nextRollingIndex;
+  private int rollingIndex;
 
   public TimeAndSizeBasedRollingPolicy(int rolloverTriggeringSizeInMB, final Path avroFileName) {
     this.timeBasedRollingCondition = new TimeBasedRollingCondition();
@@ -60,15 +60,15 @@ public class TimeAndSizeBasedRollingPolicy implements RollingPolicy {
   // Format: <path_to_file><file_name_minus_extension>-yyyy-MM-dd.index.log
   public Path getNextRolledFileName(final Path _) {
     final DateTime nextDateTimeToUse = chooseNextDateTimeToUse();
-
+    final int nextIndexToUse = chooseNextIndexToUse();
     final Path nextRolledFileName = Paths.get(avroFileName.getParent().toString(), avroFileName.getFileSystem().getSeparator()
                                                           + removeFileExtensionFrom(avroFileName)
                                                           + "-"
                                                           + dateTimeFormatterForRolledFiles.print(nextDateTimeToUse)
                                                           + "."
-                                                          + nextRollingIndex
+                                                          + nextIndexToUse
                                                           + ".log");
-    chooseNextIndexToUse();
+    updateRollingIndex();
     signalRolloverToConditions();
     return nextRolledFileName;
   }
@@ -85,12 +85,16 @@ public class TimeAndSizeBasedRollingPolicy implements RollingPolicy {
     return DateTime.now().minusDays(1);
   }
 
-  private void chooseNextIndexToUse() {
+  private int chooseNextIndexToUse() {
     if (timeBasedRollingCondition.lastRolloverHappenedBeforeToday()) {
-      nextRollingIndex = 0;
+      return rollingIndex = 0;
     } else {
-      nextRollingIndex++;
+      return rollingIndex;
     }
+  }
+
+  private void updateRollingIndex() {
+    rollingIndex++;
   }
 
   private void signalRolloverToConditions() {
@@ -107,7 +111,7 @@ public class TimeAndSizeBasedRollingPolicy implements RollingPolicy {
   }
 
   private void determineInitialRollingIndex() throws IOException {
-    nextRollingIndex = getHighestIndexFromArchivedFilesInDir() + 1;
+    rollingIndex = getHighestIndexFromArchivedFilesInDir() + 1;
   }
 
   private int getHighestIndexFromArchivedFilesInDir() throws IOException {
