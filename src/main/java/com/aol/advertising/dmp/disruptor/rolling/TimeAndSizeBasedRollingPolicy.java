@@ -53,7 +53,7 @@ public class TimeAndSizeBasedRollingPolicy implements RollingPolicy {
 
   @Override
   public boolean shouldRollover(final Path _, final SpecificRecord avroRecord) {
-    return timeBasedRollingCondition.lastRolloverHappenedBeforeToday() || sizeBasedRollingCondition.sizeThresholdHasBeenHit();
+    return sizeBasedRollingCondition.sizeThresholdHasBeenHit() || timeBasedRollingCondition.lastRolloverHappenedBeforeToday();
   }
 
   @Override
@@ -110,13 +110,13 @@ public class TimeAndSizeBasedRollingPolicy implements RollingPolicy {
   }
 
   private int getHighestIndexFromArchivedFilesInDir() throws IOException {
-    int highestIndex = Integer.MIN_VALUE;
+    int highestIndex = -1;
     try (DirectoryStream<Path> dirContents = Files.newDirectoryStream(avroFileName.getParent())) {
       for (Path archivedFileName : dirContents) {
         highestIndex = max(highestIndex, getIndexFrom(archivedFileName.getFileName().toString()));
       }
     }
-    return max(highestIndex, -1);
+    return highestIndex;
   }
 
   private int getIndexFrom(final String archivedFileName) {
