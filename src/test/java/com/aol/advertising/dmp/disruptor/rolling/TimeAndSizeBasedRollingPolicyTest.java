@@ -124,7 +124,8 @@ public class TimeAndSizeBasedRollingPolicyTest {
   public void whenTheNextRolledFileNameIsRetrieved_andTimeBasedRollIsDue_thenTheIndexOfTheRolledFileNameIsResetToZeroInTheNextCall() {
     givenThePolicyIsInitialized();
     givenTimeBasedRollIsDue();
-    givenFiledHasBeenRolledBefore();
+    givenFiledIsRolled();
+    givenTimeBasedRollIsNotDue();
 
     final int index = getIndexFrom(timeAndSizeBasedRollingPolicyUnderTest.getNextRolledFileName(null));
 
@@ -134,6 +135,7 @@ public class TimeAndSizeBasedRollingPolicyTest {
   @Test
   public void whenTheNextRolledFileNameIsRetrieved_andTimeBasedRollIsNotDue_thenTheIndexOfTheRolledFileNameIsIncreasedByOne() {
     givenThePolicyIsInitialized();
+    givenTimeBasedRollIsNotDue();
     final int initialIndex = getIndexFrom(timeAndSizeBasedRollingPolicyUnderTest.getNextRolledFileName(null));
 
     final int finalIndex = getIndexFrom(timeAndSizeBasedRollingPolicyUnderTest.getNextRolledFileName(null));
@@ -165,8 +167,12 @@ public class TimeAndSizeBasedRollingPolicyTest {
     when(timeBasedRollingConditionMock.lastRolloverHappenedBeforeToday()).thenReturn(true);
   }
   
-  private void givenFiledHasBeenRolledBefore() {
+  private void givenFiledIsRolled() {
     timeAndSizeBasedRollingPolicyUnderTest.getNextRolledFileName(null);
+  }
+
+  private void givenTimeBasedRollIsNotDue() {
+    when(timeBasedRollingConditionMock.lastRolloverHappenedBeforeToday()).thenReturn(false);
   }
 
   private void thenTheRollingIndexContinuesWhereWeLeftOff(TimeAndSizeBasedRollingPolicy timeAndSizeBasedRollingPolicyUnderTest) {

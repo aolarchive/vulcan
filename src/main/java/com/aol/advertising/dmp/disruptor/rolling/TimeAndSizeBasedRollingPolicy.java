@@ -60,13 +60,12 @@ public class TimeAndSizeBasedRollingPolicy implements RollingPolicy {
   // Format: <path_to_file><file_name_minus_extension>-yyyy-MM-dd.index.log
   public Path getNextRolledFileName(final Path _) {
     final DateTime nextDateTimeToUse = chooseNextDateTimeToUse();
-    final int nextIndexToUse = chooseNextIndexToUse();
     final Path nextRolledFileName = Paths.get(avroFileName.getParent().toString(), avroFileName.getFileSystem().getSeparator()
                                                           + removeFileExtensionFrom(avroFileName)
                                                           + "-"
                                                           + dateTimeFormatterForRolledFiles.print(nextDateTimeToUse)
                                                           + "."
-                                                          + nextIndexToUse
+                                                          + rollingIndex
                                                           + ".log");
     updateRollingIndex();
     signalRolloverToConditions();
@@ -85,16 +84,12 @@ public class TimeAndSizeBasedRollingPolicy implements RollingPolicy {
     return DateTime.now().minusDays(1);
   }
 
-  private int chooseNextIndexToUse() {
-    if (timeBasedRollingCondition.lastRolloverHappenedBeforeToday()) {
-      return rollingIndex = 0;
-    } else {
-      return rollingIndex;
-    }
-  }
-
   private void updateRollingIndex() {
-    rollingIndex++;
+    if (timeBasedRollingCondition.lastRolloverHappenedBeforeToday()) {
+      rollingIndex = 0;
+    } else {
+      rollingIndex++;
+    }
   }
 
   private void signalRolloverToConditions() {
