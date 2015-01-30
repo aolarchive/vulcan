@@ -10,16 +10,12 @@ class TimeBasedRollingCondition {
     lastRolloverDate = DateTime.now();
   }
 
-  boolean rolloverShouldHappen() {
-    return lastRolloverHappenedBeforeToday();
+  boolean lastRolloverHappenedBeforeToday() {
+    return lastRolloverDate.isBefore(new DateTime().withTimeAtStartOfDay());
   }
 
   void signalRollover() {
     lastRolloverDate = DateTime.now();
-  }
-
-  private boolean lastRolloverHappenedBeforeToday() {
-    return lastRolloverDate.isBefore(new DateTime().withTimeAtStartOfDay());
   }
 
 }

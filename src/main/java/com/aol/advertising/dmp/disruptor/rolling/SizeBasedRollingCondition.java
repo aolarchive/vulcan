@@ -43,25 +43,25 @@ class SizeBasedRollingCondition {
     }
   }
 
-  boolean rolloverShouldHappen() {
+  boolean sizeThresholdHasBeenHit() {
     try {
-      return delegateImplementation.rolloverShouldHappen();
+      return delegateImplementation.sizeThresholdHasBeenHit();
     } catch (IOException ioe) {
       throw new RuntimeException(ioe);
     }
   }
 
-  void signalFiledRolledTo(final Path rolledFileName) {
+  void signalRollover() {
     try {
-      delegateImplementation.signalFiledRolledTo(rolledFileName);
+      delegateImplementation.signalRollover();
     } catch (IOException ioe) {
       throw new RuntimeException(ioe);
     }
   }
 
   private interface RolloverShouldHappen {
-    boolean rolloverShouldHappen() throws IOException;
-    void signalFiledRolledTo(final Path rolledFileName) throws IOException;
+    boolean sizeThresholdHasBeenHit() throws IOException;
+    void signalRollover() throws IOException;
   }
 
   private class EMAWarmupPeriod implements RolloverShouldHappen {
@@ -76,7 +76,7 @@ class SizeBasedRollingCondition {
     }
 
     @Override
-    public boolean rolloverShouldHappen() throws IOException {
+    public boolean sizeThresholdHasBeenHit() throws IOException {
       if ((++recordsInCurrentFile % FIXED_SIZE_CHECK_RATE) == 0) {
         final long currentFileSize = Files.size(avroFileName);
         if (recordsHaveBeenWrittenToDisk(currentFileSize)) {
@@ -90,7 +90,7 @@ class SizeBasedRollingCondition {
     }
 
     @Override
-    public void signalFiledRolledTo(final Path _) {
+    public void signalRollover() {
       initialFileSize = 0;
       recordsInCurrentFile = 0;
     }
@@ -116,7 +116,7 @@ class SizeBasedRollingCondition {
   private class EMAReady implements RolloverShouldHappen {
 
     @Override
-    public boolean rolloverShouldHappen() throws IOException {
+    public boolean sizeThresholdHasBeenHit() throws IOException {
       if (predictedRollReached()) {
         return Files.size(avroFileName) >= rolloverTriggeringSizeInBytes;
       }
@@ -124,8 +124,8 @@ class SizeBasedRollingCondition {
     }
 
     @Override
-    public void signalFiledRolledTo(final Path rolledFileName) throws IOException {
-      updateWriteRate(Files.size(rolledFileName));
+    public void signalRollover() throws IOException {
+      updateWriteRate(Files.size(avroFileName));
       recordsInCurrentFile = 0;
     }
 

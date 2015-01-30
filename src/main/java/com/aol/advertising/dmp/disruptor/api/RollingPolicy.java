@@ -19,18 +19,12 @@ public interface RollingPolicy {
   boolean shouldRollover(final Path avroFileName, final SpecificRecord avroRecord);
   
   /**
-   * Used to decide the name of the next file to be rolled
+   * Used to decide the name of the next rolled file name. The policy can assume the file will be
+   * rolled between calls to this method
    * 
    * @param avroFileName the destination Avro file
    * @return the name of the next rolled file
    */
   Path getNextRolledFileName(final Path avroFileName);
-
-  /**
-   * Used to signal rolling occurrences to the policy object
-   * 
-   * @param avroFileName the destination Avro file
-   */
-  void signalRolloverOf(final Path avroFileName);
 
 }
