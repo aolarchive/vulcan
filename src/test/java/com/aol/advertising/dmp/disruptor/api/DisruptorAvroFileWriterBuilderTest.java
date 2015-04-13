@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Iterator;
 import java.util.concurrent.ExecutorService;
 
@@ -23,6 +24,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.mockito.Spy;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
@@ -41,11 +43,16 @@ import com.lmax.disruptor.dsl.ProducerType;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({AvroEventPublisher.class, AvroEventConsumer.class, TimeAndSizeBasedRollingPolicy.class,
-                 Disruptor.class, ProducerType.class, Files.class, DisruptorAvroFileWriterBuilder.class})
+                 Disruptor.class, ProducerType.class, Files.class, DisruptorAvroFileWriterBuilder.class,
+                 Paths.class})
 public class DisruptorAvroFileWriterBuilderTest {
+
+  private static final String AVRO_FILE_NAME = "Pizza dough";
 
   private AvroFileNameStep disruptorAvroFileWriterBuilderUnderTest;
 
+  @Spy
+  private AvroFileNameStep spyOnDisruptorAvroFileWriterBuilder = DisruptorAvroFileWriterBuilder.startCreatingANewWriter();
   @Mock
   private AvroEventPublisher avroEventPublisherMock;
   @Mock
@@ -82,8 +89,14 @@ public class DisruptorAvroFileWriterBuilderTest {
   private void initMocks() throws Exception {
     MockitoAnnotations.initMocks(this);
     mockStatic(Files.class);
+    mockPaths();
     mockConstructors();
     mockPermissions();
+  }
+
+  private void mockPaths() {
+    mockStatic(Paths.class);
+    when(Paths.get(AVRO_FILE_NAME)).thenReturn(avroFileNameMock);
   }
 
   private void mockConstructors() throws Exception {
@@ -115,7 +128,17 @@ public class DisruptorAvroFileWriterBuilderTest {
 
   @Test(expected = IllegalArgumentException.class)
   public void whenANullDestinationFileIsSpecified_thenAnIllegalArgumentExceptionIsThrown() {
-    disruptorAvroFileWriterBuilderUnderTest.thatWritesTo(null);
+    disruptorAvroFileWriterBuilderUnderTest.thatWritesTo((Path) null);
+  }
+  
+  // A data-driven test should be used instead of this delegation check, I couldn't make JunitParams work together with
+  // PowerMock though. This needs more investigation to see if they can be made to work together or maybe the test
+  // should use the default parameterized JUnit tests (not recommended)
+  @Test
+  public void whenDestinationFileIsSpecifiedAsString_thenBuildProcessIsDelegatedToThePathInterface() {
+    spyOnDisruptorAvroFileWriterBuilder.thatWritesTo(AVRO_FILE_NAME);
+
+    verify(spyOnDisruptorAvroFileWriterBuilder.thatWritesTo(avroFileNameMock));
   }
 
   @Test(expected = IllegalArgumentException.class)

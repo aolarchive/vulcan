@@ -12,4 +12,12 @@ public interface AvroFileNameStep {
    */
   AvroSchemaStep thatWritesTo(final Path avroFileName);
 
+  /**
+   * Configures the file writer to write to {@code avroFileName}.
+   * 
+   * @throws IllegalArgumentException if it is not possible to read and write to the specified
+   *         destination
+   */
+  AvroSchemaStep thatWritesTo(final String avroFileName);
+
 }

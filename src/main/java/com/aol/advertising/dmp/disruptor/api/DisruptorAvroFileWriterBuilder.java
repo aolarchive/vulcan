@@ -3,6 +3,7 @@ package com.aol.advertising.dmp.disruptor.api;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -33,8 +34,7 @@ import com.lmax.disruptor.dsl.ProducerType;
  * See:
  * <ul>
  * <li><a href="http://en.wikipedia.org/wiki/Fluent_interface">Fluent API</li>
- * <li><a href="http://rdafbn.blogspot.com/2012/07/step-builder-pattern_28.html">Step builder
- * pattern</li>
+ * <li><a href="http://rdafbn.blogspot.com/2012/07/step-builder-pattern_28.html">Step builder pattern</li>
  * </ul>
  */
 public class DisruptorAvroFileWriterBuilder implements Steps {
@@ -80,7 +80,7 @@ public class DisruptorAvroFileWriterBuilder implements Steps {
     initDefaultRollingPolicy();
     return this;
   }
-  
+
   private void validateFile() {
     if (avroFileName == null) {
       throw new IllegalArgumentException("Specified Avro file was null");
@@ -131,6 +131,11 @@ public class DisruptorAvroFileWriterBuilder implements Steps {
 
   private void tryToInitDefaultRollingPolicy() throws IOException {
     rollingPolicy = new TimeAndSizeBasedRollingPolicy(50, avroFileName);
+  }
+
+  @Override
+  public AvroSchemaStep thatWritesTo(final String avroFileName) {
+    return thatWritesTo(Paths.get(avroFileName));
   }
 
   @Override
