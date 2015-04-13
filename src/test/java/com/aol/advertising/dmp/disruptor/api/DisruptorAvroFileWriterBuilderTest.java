@@ -131,9 +131,10 @@ public class DisruptorAvroFileWriterBuilderTest {
     disruptorAvroFileWriterBuilderUnderTest.thatWritesTo((Path) null);
   }
   
-  // A data-driven test should be used instead of this delegation check, I couldn't make JunitParams work together with
-  // PowerMock though. This needs more investigation to see if they can be made to work together or maybe the test
-  // should use the default parameterized JUnit tests (not recommended)
+  // TODO: A data-driven test should be used instead of this delegation check, I couldn't make
+  // JunitParams work together with PowerMock though. This needs more investigation to see if they
+  // can be made to work together or maybe the test should use the default parameterized JUnit tests
+  // (not recommended)
   @Test
   public void whenDestinationFileIsSpecifiedAsString_thenBuildProcessIsDelegatedToThePathInterface() {
     spyOnDisruptorAvroFileWriterBuilder.thatWritesTo(AVRO_FILE_NAME);
