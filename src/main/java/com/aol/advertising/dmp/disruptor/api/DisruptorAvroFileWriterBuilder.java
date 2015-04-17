@@ -6,6 +6,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadFactory;
 
 import org.apache.avro.Schema;
 import org.slf4j.Logger;
@@ -21,6 +22,7 @@ import com.aol.advertising.dmp.disruptor.ringbuffer.AvroEventFactory;
 import com.aol.advertising.dmp.disruptor.rolling.TimeAndSizeBasedRollingPolicy;
 import com.aol.advertising.dmp.disruptor.writer.AvroEventConsumer;
 import com.aol.advertising.dmp.disruptor.writer.AvroEventPublisher;
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.lmax.disruptor.SleepingWaitStrategy;
 import com.lmax.disruptor.WaitStrategy;
 import com.lmax.disruptor.dsl.Disruptor;
@@ -40,8 +42,10 @@ import com.lmax.disruptor.dsl.ProducerType;
 public class DisruptorAvroFileWriterBuilder implements Steps {
 
   private static final Logger log = LoggerFactory.getLogger(DisruptorAvroFileWriterBuilder.class);
-
   private static final AvroEventFactory avroEventFactory = new AvroEventFactory();
+  private static final ThreadFactory consumerExecutorThreadFactory = new ThreadFactoryBuilder()
+                                                                     .setNameFormat("disruptor-avro-writer")
+                                                                     .build();
 
   private final ExecutorService consumerExecutor;
   private final AvroEventPublisher publisherUnderConstruction;
@@ -55,7 +59,7 @@ public class DisruptorAvroFileWriterBuilder implements Steps {
 
   private DisruptorAvroFileWriterBuilder() {
     publisherUnderConstruction = new AvroEventPublisher();
-    consumerExecutor = Executors.newSingleThreadExecutor();
+    consumerExecutor = Executors.newSingleThreadExecutor(consumerExecutorThreadFactory);
   }
 
   /**
