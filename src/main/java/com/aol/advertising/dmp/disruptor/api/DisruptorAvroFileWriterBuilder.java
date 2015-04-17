@@ -22,7 +22,7 @@ import com.aol.advertising.dmp.disruptor.ringbuffer.AvroEventFactory;
 import com.aol.advertising.dmp.disruptor.rolling.TimeAndSizeBasedRollingPolicy;
 import com.aol.advertising.dmp.disruptor.writer.AvroEventConsumer;
 import com.aol.advertising.dmp.disruptor.writer.AvroEventPublisher;
-import com.google.common.util.concurrent.ThreadFactoryBuilder;
+import com.aol.advertising.dmp.disruptor.writer.ConsumerThreadFactory;
 import com.lmax.disruptor.SleepingWaitStrategy;
 import com.lmax.disruptor.WaitStrategy;
 import com.lmax.disruptor.dsl.Disruptor;
@@ -43,9 +43,7 @@ public class DisruptorAvroFileWriterBuilder implements Steps {
 
   private static final Logger log = LoggerFactory.getLogger(DisruptorAvroFileWriterBuilder.class);
   private static final AvroEventFactory avroEventFactory = new AvroEventFactory();
-  private static final ThreadFactory consumerExecutorThreadFactory = new ThreadFactoryBuilder()
-                                                                     .setNameFormat("disruptor-avro-writer")
-                                                                     .build();
+  private static final ThreadFactory consumerExecutorThreadFactory = new ConsumerThreadFactory();
 
   private final ExecutorService consumerExecutor;
   private final AvroEventPublisher publisherUnderConstruction;
