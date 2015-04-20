@@ -35,7 +35,7 @@ public class DisruptorAvroFileWriterFactory {
       writerBuilder.withWaitStrategy(waitStrategy);
     }
     if (fileRollingSizeInMb > 0) {
-      writerBuilder.withAFileRollingSizeOf(fileRollingSizeInMb);
+      //writerBuilder.withAFileRollingSizeOf(fileRollingSizeInMb);
     }
     if (rollingPolicy != null) {
       writerBuilder.withRollingPolicy(rollingPolicy);

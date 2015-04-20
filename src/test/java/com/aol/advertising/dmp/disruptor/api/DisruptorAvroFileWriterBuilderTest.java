@@ -266,7 +266,7 @@ public class DisruptorAvroFileWriterBuilderTest extends ConfiguredUnitTest {
   public void whenTheFileRollingSizeForTheDefaultRollingPolicyIsConfigured_thenTheValueIsUsedWhenBuildingTheWriter() throws Exception {
     final OptionalSteps disruptorAvroFileWriterBuilderUnderTest = givenABuilderWithMandatoryStepsConfigured();
     
-    disruptorAvroFileWriterBuilderUnderTest.withAFileRollingSizeOf(CONFIGURED_FILE_ROLLING_SIZE).createNewWriter();
+    //disruptorAvroFileWriterBuilderUnderTest.withAFileRollingSizeOf(CONFIGURED_FILE_ROLLING_SIZE).createNewWriter();
     
     thenTheConfiguredRollingSizeIsUsedWhenBuildingTheWriter();
   }

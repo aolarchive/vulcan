@@ -14,6 +14,7 @@ import org.slf4j.LoggerFactory;
 
 import com.aol.advertising.dmp.disruptor.api.builder.steps.AvroFileNameStep;
 import com.aol.advertising.dmp.disruptor.api.builder.steps.AvroSchemaStep;
+import com.aol.advertising.dmp.disruptor.api.builder.steps.DefaultPolicySteps;
 import com.aol.advertising.dmp.disruptor.api.builder.steps.OptionalSteps;
 import com.aol.advertising.dmp.disruptor.api.builder.steps.Steps;
 import com.aol.advertising.dmp.disruptor.exception.DisruptorExceptionHandler;
@@ -85,7 +86,7 @@ public class DisruptorAvroFileWriterBuilder implements Steps {
 
   private void validateFile() {
     if (avroFileName == null) {
-      throw new IllegalArgumentException("Specified Avro file was null");
+      throw new NullPointerException("Specified Avro file was null");
     }
     if (Files.exists(avroFileName)) {
       validateFileIsNotADir();
@@ -142,7 +143,7 @@ public class DisruptorAvroFileWriterBuilder implements Steps {
   @Override
   public AvroSchemaStep thatWritesTo(final String avroFileName) {
     if (avroFileName == null) {
-      throw new IllegalArgumentException("Specified Avro file was null");
+      throw new NullPointerException("Specified Avro file was null");
     }
     return thatWritesTo(Paths.get(avroFileName));
   }
@@ -192,14 +193,14 @@ public class DisruptorAvroFileWriterBuilder implements Steps {
     return this;
   }
 
-  @Override
-  public OptionalSteps withAFileRollingSizeOf(int fileRollingSizeInMb) {
-    if (fileRollingSizeInMb <= 0) {
-      throw new IllegalArgumentException("File rolling size must be at least 1 MB");
-    }
-    setRollingPolicyToDefaultWithFileRollingSizeOf(fileRollingSizeInMb);
-    return this;
-  }
+//  @Override
+//  public OptionalSteps withAFileRollingSizeOf(int fileRollingSizeInMb) {
+//    if (fileRollingSizeInMb <= 0) {
+//      throw new IllegalArgumentException("File rolling size must be at least 1 MB");
+//    }
+//    setRollingPolicyToDefaultWithFileRollingSizeOf(fileRollingSizeInMb);
+//    return this;
+//  }
 
   @Override
   public DisruptorAvroFileWriter createNewWriter() {
@@ -218,5 +219,19 @@ public class DisruptorAvroFileWriterBuilder implements Steps {
     disruptor.handleExceptionsWith(new DisruptorExceptionHandler());
     disruptor.handleEventsWith(new AvroEventConsumer(avroFileName, avroSchema, rollingPolicy));
     return disruptor;
+  }
+
+  @Override
+  public DefaultPolicySteps configureDefaultPolicy() {
+    return this;
+  }
+
+  @Override
+  public OptionalSteps withAFileRollingSizeOf(int fileRollingSizeInMb) {
+    if (fileRollingSizeInMb <= 0) {
+      throw new IllegalArgumentException("File rolling size must be at least 1 MB");
+    }
+    setRollingPolicyToDefaultWithFileRollingSizeOf(fileRollingSizeInMb);
+    return this;
   }
 }

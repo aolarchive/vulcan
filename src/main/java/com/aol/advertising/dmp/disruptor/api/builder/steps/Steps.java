@@ -1,3 +1,4 @@
 package com.aol.advertising.dmp.disruptor.api.builder.steps;
 
-public interface Steps extends MandatorySteps, OptionalSteps {}
+public interface Steps extends MandatorySteps, OptionalSteps, DefaultPolicySteps {
+}
