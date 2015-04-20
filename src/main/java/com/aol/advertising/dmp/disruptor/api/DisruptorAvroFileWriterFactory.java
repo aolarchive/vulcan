@@ -1,7 +1,5 @@
 package com.aol.advertising.dmp.disruptor.api;
 
-import java.nio.file.Path;
-
 import org.apache.avro.Schema;
 
 import com.aol.advertising.dmp.disruptor.api.builder.steps.OptionalSteps;
@@ -15,11 +13,12 @@ import com.lmax.disruptor.dsl.ProducerType;
  */
 public class DisruptorAvroFileWriterFactory {
 
-  private Path avroFileName;
+  private String avroFileName;
   private Schema avroSchema;
   private int ringBufferSize;
   private ProducerType producerType;
   private WaitStrategy waitStrategy;
+  private int fileRollingSizeInMb;
   private RollingPolicy rollingPolicy;
   
   public DisruptorAvroFileWriter createNewWriter() {
@@ -35,6 +34,9 @@ public class DisruptorAvroFileWriterFactory {
     if (waitStrategy != null) {
       writerBuilder.withWaitStrategy(waitStrategy);
     }
+    if (fileRollingSizeInMb > 0) {
+      writerBuilder.withAFileRollingSizeOf(fileRollingSizeInMb);
+    }
     if (rollingPolicy != null) {
       writerBuilder.withRollingPolicy(rollingPolicy);
     }
@@ -42,7 +44,7 @@ public class DisruptorAvroFileWriterFactory {
   }
 
 
-  public void setAvroFileName(final Path avroFileName) {
+  public void setAvroFileName(final String avroFileName) {
     this.avroFileName = avroFileName;
   }
 
@@ -62,8 +64,11 @@ public class DisruptorAvroFileWriterFactory {
     this.waitStrategy = waitStrategy;
   }
 
+  public void setFileRollingSizeInMb(int fileRollingSizeInMb) {
+    this.fileRollingSizeInMb = fileRollingSizeInMb;
+  }
+
   public void setRollingPolicy(final RollingPolicy rollingPolicy) {
     this.rollingPolicy = rollingPolicy;
   }
-
 }

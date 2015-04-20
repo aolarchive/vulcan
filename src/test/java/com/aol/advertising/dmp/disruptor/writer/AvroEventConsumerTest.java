@@ -24,19 +24,19 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InOrder;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
+import com.aol.advertising.dmp.disruptor.ConfiguredUnitTest;
 import com.aol.advertising.dmp.disruptor.api.RollingPolicy;
 import com.aol.advertising.dmp.disruptor.ringbuffer.AvroEvent;
 import com.aol.advertising.dmp.disruptor.utils.FilesOpsFacade;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({DataFileReader.class, AvroEventConsumer.class})
-public class AvroEventConsumerTest {
+public class AvroEventConsumerTest extends ConfiguredUnitTest {
 
   private AvroEventConsumer avroEventConsumerUnderTest;
 
@@ -72,8 +72,6 @@ public class AvroEventConsumerTest {
   }
   
   private void initMocks() throws Exception {
-    MockitoAnnotations.initMocks(this);
-
     whenNew(DataFileWriter.class).withAnyArguments().thenReturn(avroFileWriterMock);
     whenNew(DataFileReader.class).withParameterTypes(File.class, DatumReader.class)
                                  .withArguments(eq(avroFileNameAsFileMock), any(GenericDatumReader.class))

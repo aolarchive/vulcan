@@ -44,6 +44,12 @@ public interface OptionalSteps {
   OptionalSteps withRollingPolicy(final RollingPolicy rollingPolicy);
 
   /**
+   * Use the default {@link TimeAndSizeBasedRollingPolicy} rolling policy configured with a maximum
+   * file size of {@code fileRollingSizeInMb} in MBs
+   */
+  OptionalSteps withAFileRollingSizeOf(final int fileRollingSizeInMb);
+
+  /**
    * Finish configuration and create a new {@link DisruptorAvroFileWriter} instance
    */
   DisruptorAvroFileWriter createNewWriter();

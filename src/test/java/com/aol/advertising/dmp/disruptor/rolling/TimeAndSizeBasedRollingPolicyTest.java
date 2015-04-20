@@ -24,13 +24,14 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Answers;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
+import com.aol.advertising.dmp.disruptor.ConfiguredUnitTest;
+
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({Files.class, TimeBasedRollingCondition.class, SizeBasedRollingCondition.class, TimeAndSizeBasedRollingPolicy.class})
-public class TimeAndSizeBasedRollingPolicyTest {
+public class TimeAndSizeBasedRollingPolicyTest extends ConfiguredUnitTest {
 
   private static final int ROLLOVER_SIZE = 42;
   private static final String AVRO_FILE_NAME = "MonsterTruckMadness";
@@ -57,7 +58,6 @@ public class TimeAndSizeBasedRollingPolicyTest {
   }
 
   private void initMocks() throws Exception {
-    MockitoAnnotations.initMocks(this);
     mockStatic(Files.class);
     mockStatic(TimeBasedRollingCondition.class);
     mockStatic(SizeBasedRollingCondition.class);

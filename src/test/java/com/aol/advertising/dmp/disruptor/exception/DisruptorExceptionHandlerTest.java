@@ -12,15 +12,16 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.aol.advertising.dmp.disruptor.ConfiguredUnitTest;
+
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({LoggerFactory.class, DisruptorExceptionHandler.class})
-public class DisruptorExceptionHandlerTest {
+public class DisruptorExceptionHandlerTest extends ConfiguredUnitTest {
   
   private DisruptorExceptionHandler disruptorExceptionHandlerUnderTest;
 
@@ -39,8 +40,6 @@ public class DisruptorExceptionHandlerTest {
 
   @Before
   public void setUp() {
-    MockitoAnnotations.initMocks(this);
-
     disruptorExceptionHandlerUnderTest = new DisruptorExceptionHandler();
   }
   

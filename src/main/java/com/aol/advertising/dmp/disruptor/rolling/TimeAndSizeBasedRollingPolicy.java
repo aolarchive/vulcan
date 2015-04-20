@@ -43,9 +43,9 @@ public class TimeAndSizeBasedRollingPolicy implements RollingPolicy {
 
   private int rollingIndex;
 
-  public TimeAndSizeBasedRollingPolicy(int rolloverTriggeringSizeInMB, final Path avroFileName) {
+  public TimeAndSizeBasedRollingPolicy(int rolloverTriggeringSizeInMb, final Path avroFileName) {
     this.timeBasedRollingCondition = new TimeBasedRollingCondition();
-    this.sizeBasedRollingCondition = new SizeBasedRollingCondition(avroFileName, rolloverTriggeringSizeInMB);
+    this.sizeBasedRollingCondition = new SizeBasedRollingCondition(avroFileName, rolloverTriggeringSizeInMb);
     this.avroFileName = avroFileName;
 
     init();

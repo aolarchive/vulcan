@@ -9,12 +9,12 @@ import org.apache.avro.specific.SpecificRecord;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 
+import com.aol.advertising.dmp.disruptor.ConfiguredUnitTest;
 import com.aol.advertising.dmp.disruptor.ringbuffer.AvroEvent;
 import com.lmax.disruptor.dsl.Disruptor;
 
-public class AvroEventPublisherTest {
+public class AvroEventPublisherTest extends ConfiguredUnitTest {
 
   private AvroEventPublisher avroEventPublisherUnderTest;
 
@@ -29,8 +29,6 @@ public class AvroEventPublisherTest {
 
   @Before
   public void setUp() throws Exception {
-    MockitoAnnotations.initMocks(this);
-
     avroEventPublisherUnderTest = new AvroEventPublisher();
     avroEventPublisherUnderTest.registerConsumerExecutorForShutdown(consumerExecutorMock);
   }

@@ -79,7 +79,7 @@ public class DisruptorAvroFileWriterBuilder implements Steps {
   public AvroSchemaStep thatWritesTo(final Path avroFileName) {
     this.avroFileName = avroFileName;
     validateFile();
-    initDefaultRollingPolicy();
+    initRollingPolicyWithDefault();
     return this;
   }
 
@@ -123,20 +123,27 @@ public class DisruptorAvroFileWriterBuilder implements Steps {
     }
   }
 
-  private void initDefaultRollingPolicy() {
+  private void initRollingPolicyWithDefault() {
+    setRollingPolicyToDefaultWithFileRollingSizeOf(50);
+  }
+
+  private void setRollingPolicyToDefaultWithFileRollingSizeOf(final int fileRollingSizeInMb) {
     try {
-      tryToInitDefaultRollingPolicy();
+      tryToSetRollingPolicyToDefaultWithFileRollingSizeOf(fileRollingSizeInMb);
     } catch (IOException ioe) {
       throw new IllegalArgumentException(ioe);
     }
   }
 
-  private void tryToInitDefaultRollingPolicy() throws IOException {
-    rollingPolicy = new TimeAndSizeBasedRollingPolicy(50, avroFileName);
+  private void tryToSetRollingPolicyToDefaultWithFileRollingSizeOf(final int fileRollingSizeInMb) throws IOException {
+    rollingPolicy = new TimeAndSizeBasedRollingPolicy(fileRollingSizeInMb, avroFileName);
   }
 
   @Override
   public AvroSchemaStep thatWritesTo(final String avroFileName) {
+    if (avroFileName == null) {
+      throw new IllegalArgumentException("Specified Avro file was null");
+    }
     return thatWritesTo(Paths.get(avroFileName));
   }
 
@@ -182,6 +189,15 @@ public class DisruptorAvroFileWriterBuilder implements Steps {
     } else {
       log.warn("Tried to configure the file rolling policy with a null value");
     }
+    return this;
+  }
+
+  @Override
+  public OptionalSteps withAFileRollingSizeOf(int fileRollingSizeInMb) {
+    if (fileRollingSizeInMb <= 0) {
+      throw new IllegalArgumentException("File rolling size must be at least 1 MB");
+    }
+    setRollingPolicyToDefaultWithFileRollingSizeOf(fileRollingSizeInMb);
     return this;
   }
 
