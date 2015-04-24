@@ -4,12 +4,8 @@ public class DefaultRollingPolicyConfiguration {
 
   private int rollingSizeInMb;
 
-  private DefaultRollingPolicyConfiguration() {
+  public DefaultRollingPolicyConfiguration() {
     rollingSizeInMb = 50;
-  }
-
-  public static DefaultRollingPolicyConfiguration getConfiguration() {
-    return new DefaultRollingPolicyConfiguration();
   }
 
   public DefaultRollingPolicyConfiguration withFileRollingSizeOf(final int rollingSizeInMb) {

@@ -125,8 +125,7 @@ public class DisruptorAvroFileWriterBuilder implements Steps {
   }
 
   private void initRollingPolicyWithDefaultConfiguration() {
-    final DefaultRollingPolicyConfiguration defaultConfiguration = DefaultRollingPolicyConfiguration.getConfiguration();
-    rollingPolicy = new TimeAndSizeBasedRollingPolicy(defaultConfiguration);
+    rollingPolicy = new TimeAndSizeBasedRollingPolicy(new DefaultRollingPolicyConfiguration());
   }
 
   @Override
