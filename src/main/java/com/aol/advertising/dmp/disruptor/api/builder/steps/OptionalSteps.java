@@ -1,7 +1,8 @@
 package com.aol.advertising.dmp.disruptor.api.builder.steps;
 
 import com.aol.advertising.dmp.disruptor.api.DisruptorAvroFileWriter;
-import com.aol.advertising.dmp.disruptor.api.RollingPolicy;
+import com.aol.advertising.dmp.disruptor.api.rolling.DefaultRollingPolicyConfiguration;
+import com.aol.advertising.dmp.disruptor.api.rolling.RollingPolicy;
 import com.aol.advertising.dmp.disruptor.rolling.TimeAndSizeBasedRollingPolicy;
 import com.lmax.disruptor.SleepingWaitStrategy;
 import com.lmax.disruptor.WaitStrategy;
@@ -43,13 +44,10 @@ public interface OptionalSteps {
    */
   OptionalSteps withRollingPolicy(final RollingPolicy rollingPolicy);
 
-//  /**
-//   * Use the default {@link TimeAndSizeBasedRollingPolicy} rolling policy configured with a maximum
-//   * file size of {@code fileRollingSizeInMb} in MBs
-//   */
-//  OptionalSteps withAFileRollingSizeOf(final int fileRollingSizeInMb);
-
-  DefaultPolicySteps configureDefaultPolicy();
+  /**
+   * Configures the default rolling policy with {@code configuration}
+   */
+  OptionalSteps withDefaultRollingPolicyConfiguration(final DefaultRollingPolicyConfiguration configuration);
 
   /**
    * Finish configuration and create a new {@link DisruptorAvroFileWriter} instance

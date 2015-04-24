@@ -1,6 +1,5 @@
 package com.aol.advertising.dmp.disruptor.api;
 
-import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -14,9 +13,10 @@ import org.slf4j.LoggerFactory;
 
 import com.aol.advertising.dmp.disruptor.api.builder.steps.AvroFileNameStep;
 import com.aol.advertising.dmp.disruptor.api.builder.steps.AvroSchemaStep;
-import com.aol.advertising.dmp.disruptor.api.builder.steps.DefaultPolicySteps;
 import com.aol.advertising.dmp.disruptor.api.builder.steps.OptionalSteps;
 import com.aol.advertising.dmp.disruptor.api.builder.steps.Steps;
+import com.aol.advertising.dmp.disruptor.api.rolling.DefaultRollingPolicyConfiguration;
+import com.aol.advertising.dmp.disruptor.api.rolling.RollingPolicy;
 import com.aol.advertising.dmp.disruptor.exception.DisruptorExceptionHandler;
 import com.aol.advertising.dmp.disruptor.ringbuffer.AvroEvent;
 import com.aol.advertising.dmp.disruptor.ringbuffer.AvroEventFactory;
@@ -80,7 +80,7 @@ public class DisruptorAvroFileWriterBuilder implements Steps {
   public AvroSchemaStep thatWritesTo(final Path avroFileName) {
     this.avroFileName = avroFileName;
     validateFile();
-    initRollingPolicyWithDefault();
+    initRollingPolicyWithDefaultConfiguration();
     return this;
   }
 
@@ -124,20 +124,9 @@ public class DisruptorAvroFileWriterBuilder implements Steps {
     }
   }
 
-  private void initRollingPolicyWithDefault() {
-    setRollingPolicyToDefaultWithFileRollingSizeOf(50);
-  }
-
-  private void setRollingPolicyToDefaultWithFileRollingSizeOf(final int fileRollingSizeInMb) {
-    try {
-      tryToSetRollingPolicyToDefaultWithFileRollingSizeOf(fileRollingSizeInMb);
-    } catch (IOException ioe) {
-      throw new IllegalArgumentException(ioe);
-    }
-  }
-
-  private void tryToSetRollingPolicyToDefaultWithFileRollingSizeOf(final int fileRollingSizeInMb) throws IOException {
-    rollingPolicy = new TimeAndSizeBasedRollingPolicy(fileRollingSizeInMb, avroFileName);
+  private void initRollingPolicyWithDefaultConfiguration() {
+    final DefaultRollingPolicyConfiguration defaultConfiguration = DefaultRollingPolicyConfiguration.getConfiguration();
+    rollingPolicy = new TimeAndSizeBasedRollingPolicy(defaultConfiguration);
   }
 
   @Override
@@ -193,17 +182,15 @@ public class DisruptorAvroFileWriterBuilder implements Steps {
     return this;
   }
 
-//  @Override
-//  public OptionalSteps withAFileRollingSizeOf(int fileRollingSizeInMb) {
-//    if (fileRollingSizeInMb <= 0) {
-//      throw new IllegalArgumentException("File rolling size must be at least 1 MB");
-//    }
-//    setRollingPolicyToDefaultWithFileRollingSizeOf(fileRollingSizeInMb);
-//    return this;
-//  }
+  @Override
+  public OptionalSteps withDefaultRollingPolicyConfiguration(final DefaultRollingPolicyConfiguration configuration) {
+    rollingPolicy = new TimeAndSizeBasedRollingPolicy(configuration);
+    return this;
+  }
 
   @Override
   public DisruptorAvroFileWriter createNewWriter() {
+    rollingPolicy.registerAvroFileName(avroFileName);
     publisherUnderConstruction.registerConsumerExecutorForShutdown(consumerExecutor);
     publisherUnderConstruction.startPublisherUsing(buildDisruptor());
     return publisherUnderConstruction;
@@ -219,19 +206,5 @@ public class DisruptorAvroFileWriterBuilder implements Steps {
     disruptor.handleExceptionsWith(new DisruptorExceptionHandler());
     disruptor.handleEventsWith(new AvroEventConsumer(avroFileName, avroSchema, rollingPolicy));
     return disruptor;
-  }
-
-  @Override
-  public DefaultPolicySteps configureDefaultPolicy() {
-    return this;
-  }
-
-  @Override
-  public OptionalSteps withAFileRollingSizeOf(int fileRollingSizeInMb) {
-    if (fileRollingSizeInMb <= 0) {
-      throw new IllegalArgumentException("File rolling size must be at least 1 MB");
-    }
-    setRollingPolicyToDefaultWithFileRollingSizeOf(fileRollingSizeInMb);
-    return this;
   }
 }

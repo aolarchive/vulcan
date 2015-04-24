@@ -3,6 +3,7 @@ package com.aol.advertising.dmp.disruptor.api;
 import org.apache.avro.Schema;
 
 import com.aol.advertising.dmp.disruptor.api.builder.steps.OptionalSteps;
+import com.aol.advertising.dmp.disruptor.api.rolling.RollingPolicy;
 import com.lmax.disruptor.WaitStrategy;
 import com.lmax.disruptor.dsl.ProducerType;
 

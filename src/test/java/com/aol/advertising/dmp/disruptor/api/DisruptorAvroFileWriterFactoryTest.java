@@ -13,6 +13,7 @@ import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
 import com.aol.advertising.dmp.disruptor.ConfiguredUnitTest;
+import com.aol.advertising.dmp.disruptor.api.rolling.RollingPolicy;
 import com.lmax.disruptor.WaitStrategy;
 import com.lmax.disruptor.dsl.ProducerType;
 
