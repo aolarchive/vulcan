@@ -3,6 +3,7 @@ package com.aol.advertising.dmp.disruptor.api;
 import org.apache.avro.Schema;
 
 import com.aol.advertising.dmp.disruptor.api.builder.steps.OptionalSteps;
+import com.aol.advertising.dmp.disruptor.api.rolling.DefaultRollingPolicyConfiguration;
 import com.aol.advertising.dmp.disruptor.api.rolling.RollingPolicy;
 import com.lmax.disruptor.WaitStrategy;
 import com.lmax.disruptor.dsl.ProducerType;
@@ -19,8 +20,8 @@ public class DisruptorAvroFileWriterFactory {
   private int ringBufferSize;
   private ProducerType producerType;
   private WaitStrategy waitStrategy;
-  private int fileRollingSizeInMb;
   private RollingPolicy rollingPolicy;
+  private DefaultRollingPolicyConfiguration defaultRollingPolicyConfiguration;
   
   public DisruptorAvroFileWriter createNewWriter() {
     final OptionalSteps writerBuilder = DisruptorAvroFileWriterBuilder.startCreatingANewWriter()
@@ -35,8 +36,8 @@ public class DisruptorAvroFileWriterFactory {
     if (waitStrategy != null) {
       writerBuilder.withWaitStrategy(waitStrategy);
     }
-    if (fileRollingSizeInMb > 0) {
-      //writerBuilder.withAFileRollingSizeOf(fileRollingSizeInMb);
+    if (defaultRollingPolicyConfiguration != null) {
+      writerBuilder.withDefaultRollingPolicyConfiguration(defaultRollingPolicyConfiguration);
     }
     if (rollingPolicy != null) {
       writerBuilder.withRollingPolicy(rollingPolicy);
@@ -65,8 +66,8 @@ public class DisruptorAvroFileWriterFactory {
     this.waitStrategy = waitStrategy;
   }
 
-  public void setFileRollingSizeInMb(int fileRollingSizeInMb) {
-    this.fileRollingSizeInMb = fileRollingSizeInMb;
+  public void setDefaultRollingPolicyConfiguration(DefaultRollingPolicyConfiguration configuration) {
+    this.defaultRollingPolicyConfiguration = configuration;
   }
 
   public void setRollingPolicy(final RollingPolicy rollingPolicy) {
