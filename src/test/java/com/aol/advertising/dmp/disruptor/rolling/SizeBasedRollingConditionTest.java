@@ -17,7 +17,6 @@ import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
 import com.aol.advertising.dmp.disruptor.ConfiguredUnitTest;
-import com.aol.advertising.dmp.disruptor.api.rolling.DefaultRollingPolicyConfiguration;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({Files.class, SizeBasedRollingCondition.class})
@@ -26,8 +25,8 @@ public class SizeBasedRollingConditionTest extends ConfiguredUnitTest {
   private static final int ONE_MB_IN_BYTES = 1_048_576;
   private static final int ROLLOVER_SIZE_IN_BYTES = ONE_MB_IN_BYTES;
   private static final int BYTES_TO_EVENT_RATIO = 1024;
-  private static final DefaultRollingPolicyConfiguration DEFAULT_ROLLING_POLICY_CONFIGURATION =
-      new DefaultRollingPolicyConfiguration().withFileRollingSizeOf(ROLLOVER_SIZE_IN_BYTES / ONE_MB_IN_BYTES);
+  private static final TimeAndSizeBasedRollingPolicyConfig ROLLING_POLICY_CONFIGURATION =
+      new TimeAndSizeBasedRollingPolicyConfig().withFileRollingSizeOf(ROLLOVER_SIZE_IN_BYTES / ONE_MB_IN_BYTES);
 
   private SizeBasedRollingCondition sizeBasedRollingConditionUnderTest;
 
@@ -39,8 +38,7 @@ public class SizeBasedRollingConditionTest extends ConfiguredUnitTest {
   @Before
   public void setUp() throws Exception {
     initMocks();
-    sizeBasedRollingConditionUnderTest =
-        new SizeBasedRollingCondition(DEFAULT_ROLLING_POLICY_CONFIGURATION.getRollingSizeInMb());
+    sizeBasedRollingConditionUnderTest = new SizeBasedRollingCondition(ROLLING_POLICY_CONFIGURATION.getRollingSizeInMb());
     sizeBasedRollingConditionUnderTest.registerAvroFileName(avroFileNameMock);
   }
 

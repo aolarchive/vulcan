@@ -29,7 +29,6 @@ import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
 import com.aol.advertising.dmp.disruptor.ConfiguredUnitTest;
-import com.aol.advertising.dmp.disruptor.api.rolling.DefaultRollingPolicyConfiguration;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({Files.class, TimeBasedRollingCondition.class, SizeBasedRollingCondition.class, TimeAndSizeBasedRollingPolicy.class})
@@ -37,8 +36,8 @@ public class TimeAndSizeBasedRollingPolicyTest extends ConfiguredUnitTest {
 
   private static final String AVRO_FILE_NAME = "MonsterTruckMadness";
   private static final int ROLLOVER_SIZE = 42;
-  private static final DefaultRollingPolicyConfiguration DEFAULT_ROLLING_POLICY_CONFIGURATION =
-      new DefaultRollingPolicyConfiguration().withFileRollingSizeOf(ROLLOVER_SIZE);
+  private static final TimeAndSizeBasedRollingPolicyConfig ROLLING_POLICY_CONFIGURATION =
+      new TimeAndSizeBasedRollingPolicyConfig().withFileRollingSizeOf(ROLLOVER_SIZE);
 
   private TimeAndSizeBasedRollingPolicy timeAndSizeBasedRollingPolicyUnderTest;
 
@@ -82,7 +81,7 @@ public class TimeAndSizeBasedRollingPolicyTest extends ConfiguredUnitTest {
   public void whenThePolicyIsInitialized_thenSizeBasedConditionIsBuiltWithTheConfiguredRollingSize() throws Exception {
     whenThePolicyIsInitialized();
 
-    verifyNew(SizeBasedRollingCondition.class).withArguments(DEFAULT_ROLLING_POLICY_CONFIGURATION.getRollingSizeInMb());
+    verifyNew(SizeBasedRollingCondition.class).withArguments(ROLLING_POLICY_CONFIGURATION.getRollingSizeInMb());
   }
 
   @Test
@@ -171,7 +170,7 @@ public class TimeAndSizeBasedRollingPolicyTest extends ConfiguredUnitTest {
   }
   
   private void givenThePolicyIsInitialized() {
-    timeAndSizeBasedRollingPolicyUnderTest = new TimeAndSizeBasedRollingPolicy(DEFAULT_ROLLING_POLICY_CONFIGURATION);
+    timeAndSizeBasedRollingPolicyUnderTest = new TimeAndSizeBasedRollingPolicy(ROLLING_POLICY_CONFIGURATION);
     timeAndSizeBasedRollingPolicyUnderTest.registerAvroFileName(avroFileNameMock);
   }
   

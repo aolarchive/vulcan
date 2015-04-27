@@ -30,12 +30,12 @@ import org.powermock.modules.junit4.PowerMockRunner;
 import com.aol.advertising.dmp.disruptor.ConfiguredUnitTest;
 import com.aol.advertising.dmp.disruptor.api.builder.steps.AvroFileNameStep;
 import com.aol.advertising.dmp.disruptor.api.builder.steps.OptionalSteps;
-import com.aol.advertising.dmp.disruptor.api.rolling.DefaultRollingPolicyConfiguration;
 import com.aol.advertising.dmp.disruptor.api.rolling.RollingPolicy;
 import com.aol.advertising.dmp.disruptor.exception.DisruptorExceptionHandler;
 import com.aol.advertising.dmp.disruptor.ringbuffer.AvroEvent;
 import com.aol.advertising.dmp.disruptor.ringbuffer.AvroEventFactory;
 import com.aol.advertising.dmp.disruptor.rolling.TimeAndSizeBasedRollingPolicy;
+import com.aol.advertising.dmp.disruptor.rolling.TimeAndSizeBasedRollingPolicyConfig;
 import com.aol.advertising.dmp.disruptor.writer.AvroEventConsumer;
 import com.aol.advertising.dmp.disruptor.writer.AvroEventPublisher;
 import com.lmax.disruptor.SleepingWaitStrategy;
@@ -52,8 +52,8 @@ import com.lmax.disruptor.dsl.ProducerType;
 public class DisruptorAvroFileWriterBuilderTest extends ConfiguredUnitTest {
 
   private static final String AVRO_FILE_NAME = "Pizza dough";
-  private static final DefaultRollingPolicyConfiguration DEFAULT_ROLLING_POLICY_CONFIGURATION =
-      new DefaultRollingPolicyConfiguration().withFileRollingSizeOf(345);
+  private static final TimeAndSizeBasedRollingPolicyConfig ROLLING_POLICY_CONFIGURATION =
+      new TimeAndSizeBasedRollingPolicyConfig().withFileRollingSizeOf(345);
 
   private AvroFileNameStep disruptorAvroFileWriterBuilderUnderTest;
 
@@ -110,7 +110,7 @@ public class DisruptorAvroFileWriterBuilderTest extends ConfiguredUnitTest {
     whenNew(AvroEventPublisher.class).withAnyArguments().thenReturn(avroEventPublisherMock);
     whenNew(AvroEventConsumer.class).withAnyArguments().thenReturn(avroEventConsumerMock);
     whenNew(TimeAndSizeBasedRollingPolicy.class).withAnyArguments().thenReturn(timeAndSizeBasedRollingPolicyMock);
-    whenNew(TimeAndSizeBasedRollingPolicy.class).withArguments(DEFAULT_ROLLING_POLICY_CONFIGURATION)
+    whenNew(TimeAndSizeBasedRollingPolicy.class).withArguments(ROLLING_POLICY_CONFIGURATION)
                                                 .thenReturn(configuredTimeAndSizeBasedRollingPolicyMock);
     whenNew(Disruptor.class).withAnyArguments().thenReturn(disruptorMock);
   }
@@ -271,7 +271,8 @@ public class DisruptorAvroFileWriterBuilderTest extends ConfiguredUnitTest {
   public void whenAConfigurationForTheDefaultRollingPolicyIsSpecified_thenTheValueIsUsedWhenBuildingTheWriter() throws Exception {
     final OptionalSteps disruptorAvroFileWriterBuilderUnderTest = givenABuilderWithMandatoryStepsConfigured();
     
-    disruptorAvroFileWriterBuilderUnderTest.withDefaultRollingPolicyConfiguration(DEFAULT_ROLLING_POLICY_CONFIGURATION).createNewWriter();
+    disruptorAvroFileWriterBuilderUnderTest.withDefaultRollingPolicyConfiguration(
+        ROLLING_POLICY_CONFIGURATION).createNewWriter();
     
     thenTheConfigurationForTheDefaultPolicyIsUsedWhenBuildingTheWriterObject();
   }
@@ -398,7 +399,7 @@ public class DisruptorAvroFileWriterBuilderTest extends ConfiguredUnitTest {
   }
 
   private void thenTheConfigurationForTheDefaultPolicyIsUsedWhenBuildingTheWriterObject() throws Exception {
-    verifyNew(TimeAndSizeBasedRollingPolicy.class).withArguments(DEFAULT_ROLLING_POLICY_CONFIGURATION);
+    verifyNew(TimeAndSizeBasedRollingPolicy.class).withArguments(ROLLING_POLICY_CONFIGURATION);
     verifyNew(AvroEventConsumer.class).withArguments(any(Path.class), any(Schema.class), eq(configuredTimeAndSizeBasedRollingPolicyMock));
     verifyWriterIsStartedWithConfiguredObjects();
   }
@@ -406,6 +407,6 @@ public class DisruptorAvroFileWriterBuilderTest extends ConfiguredUnitTest {
   @SuppressWarnings("unchecked")
   private void verifyWriterIsStartedWithConfiguredObjects() {
     verify(disruptorMock).handleEventsWith(avroEventConsumerMock);
-    verify(avroEventPublisherMock).startPublisherUsing(disruptorMock); 
+    verify(avroEventPublisherMock).startPublisherUsing(disruptorMock);
   }
 }

@@ -1,14 +1,14 @@
-package com.aol.advertising.dmp.disruptor.api.rolling;
+package com.aol.advertising.dmp.disruptor.rolling;
 
-public class DefaultRollingPolicyConfiguration {
+public class TimeAndSizeBasedRollingPolicyConfig {
 
   private int rollingSizeInMb;
 
-  public DefaultRollingPolicyConfiguration() {
+  public TimeAndSizeBasedRollingPolicyConfig() {
     rollingSizeInMb = 50;
   }
 
-  public DefaultRollingPolicyConfiguration withFileRollingSizeOf(final int rollingSizeInMb) {
+  public TimeAndSizeBasedRollingPolicyConfig withFileRollingSizeOf(final int rollingSizeInMb) {
     if (rollingSizeInMb <= 0) {
       throw new IllegalArgumentException("File rolling size must be at least 1 MB");
     }

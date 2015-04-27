@@ -1,4 +1,4 @@
-package com.aol.advertising.dmp.disruptor.api.rolling;
+package com.aol.advertising.dmp.disruptor.rolling;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -7,31 +7,33 @@ import static org.hamcrest.Matchers.is;
 import org.junit.Before;
 import org.junit.Test;
 
-public class DefaultRollingPolicyConfigurationTest {
+import com.aol.advertising.dmp.disruptor.rolling.TimeAndSizeBasedRollingPolicyConfig;
+
+public class TimeAndSizeBasedRollingPolicyConfigTest {
 
   private int ROLLING_SIZE_IN_MB = 34;
 
-  private DefaultRollingPolicyConfiguration defaultRollingPolicyConfigurationUnderTest;
+  private TimeAndSizeBasedRollingPolicyConfig timeAndSizeBasedRollingPolicyConfigUnderTest;
 
   @Before
   public void setUp() {
-    defaultRollingPolicyConfigurationUnderTest = new DefaultRollingPolicyConfiguration();
+    timeAndSizeBasedRollingPolicyConfigUnderTest = new TimeAndSizeBasedRollingPolicyConfig();
   }
 
   @Test(expected = IllegalArgumentException.class)
   public void whenFileRollingSizeSpecifiedIsLowerThan1Mb_thenThrowAnIllegalArgumentException() {
-    defaultRollingPolicyConfigurationUnderTest.withFileRollingSizeOf(0);
+    timeAndSizeBasedRollingPolicyConfigUnderTest.withFileRollingSizeOf(0);
   }
 
   @Test
   public void whenRollingSizeIsNotOverriden_thenAConfigurationWithARollingSizeOf50MbIsReturned() {
-    assertThat(defaultRollingPolicyConfigurationUnderTest.getRollingSizeInMb(), is(equalTo(50)));
+    assertThat(timeAndSizeBasedRollingPolicyConfigUnderTest.getRollingSizeInMb(), is(equalTo(50)));
   }
 
   @Test
   public void whenArgumentRestrictionsAreSatisfied_thenAConfigurationWithSpecifiedRollingSizeIsReturned() {
-    final DefaultRollingPolicyConfiguration configuration =
-        defaultRollingPolicyConfigurationUnderTest.withFileRollingSizeOf(ROLLING_SIZE_IN_MB);
+    final TimeAndSizeBasedRollingPolicyConfig configuration =
+        timeAndSizeBasedRollingPolicyConfigUnderTest.withFileRollingSizeOf(ROLLING_SIZE_IN_MB);
 
     assertThat(configuration.getRollingSizeInMb(), is(equalTo(ROLLING_SIZE_IN_MB)));
   }

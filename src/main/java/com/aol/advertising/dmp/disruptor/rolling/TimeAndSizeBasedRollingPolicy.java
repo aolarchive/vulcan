@@ -17,7 +17,6 @@ import org.joda.time.format.DateTimeFormatter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.aol.advertising.dmp.disruptor.api.rolling.DefaultRollingPolicyConfiguration;
 import com.aol.advertising.dmp.disruptor.api.rolling.RollingPolicy;
 
 /**
@@ -44,7 +43,7 @@ public class TimeAndSizeBasedRollingPolicy implements RollingPolicy {
   private Path avroFileName;
   private int rollingIndex;
 
-  public TimeAndSizeBasedRollingPolicy(final DefaultRollingPolicyConfiguration configuration) {
+  public TimeAndSizeBasedRollingPolicy(final TimeAndSizeBasedRollingPolicyConfig configuration) {
     this.timeBasedRollingCondition = new TimeBasedRollingCondition();
     this.sizeBasedRollingCondition = new SizeBasedRollingCondition(configuration.getRollingSizeInMb());
   }
