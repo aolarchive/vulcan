@@ -30,6 +30,7 @@ import org.powermock.modules.junit4.PowerMockRunner;
 import com.aol.advertising.dmp.disruptor.ConfiguredUnitTest;
 import com.aol.advertising.dmp.disruptor.api.builder.steps.AvroFileNameStep;
 import com.aol.advertising.dmp.disruptor.api.builder.steps.OptionalSteps;
+import com.aol.advertising.dmp.disruptor.api.rolling.DefaultRollingPolicyConfiguration;
 import com.aol.advertising.dmp.disruptor.api.rolling.RollingPolicy;
 import com.aol.advertising.dmp.disruptor.exception.DisruptorExceptionHandler;
 import com.aol.advertising.dmp.disruptor.ringbuffer.AvroEvent;
@@ -42,14 +43,17 @@ import com.lmax.disruptor.WaitStrategy;
 import com.lmax.disruptor.dsl.Disruptor;
 import com.lmax.disruptor.dsl.ProducerType;
 
+// @formatter:off
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({AvroEventPublisher.class, AvroEventConsumer.class, TimeAndSizeBasedRollingPolicy.class,
                  Disruptor.class, ProducerType.class, Files.class, DisruptorAvroFileWriterBuilder.class,
                  Paths.class})
+// @formatter:on
 public class DisruptorAvroFileWriterBuilderTest extends ConfiguredUnitTest {
 
   private static final String AVRO_FILE_NAME = "Pizza dough";
-  private static final int CONFIGURED_FILE_ROLLING_SIZE = 345;
+  private static final DefaultRollingPolicyConfiguration DEFAULT_ROLLING_POLICY_CONFIGURATION =
+      new DefaultRollingPolicyConfiguration().withFileRollingSizeOf(345);
 
   private AvroFileNameStep disruptorAvroFileWriterBuilderUnderTest;
 
@@ -106,7 +110,7 @@ public class DisruptorAvroFileWriterBuilderTest extends ConfiguredUnitTest {
     whenNew(AvroEventPublisher.class).withAnyArguments().thenReturn(avroEventPublisherMock);
     whenNew(AvroEventConsumer.class).withAnyArguments().thenReturn(avroEventConsumerMock);
     whenNew(TimeAndSizeBasedRollingPolicy.class).withAnyArguments().thenReturn(timeAndSizeBasedRollingPolicyMock);
-    whenNew(TimeAndSizeBasedRollingPolicy.class).withArguments(eq(CONFIGURED_FILE_ROLLING_SIZE), any(Path.class))
+    whenNew(TimeAndSizeBasedRollingPolicy.class).withArguments(DEFAULT_ROLLING_POLICY_CONFIGURATION)
                                                 .thenReturn(configuredTimeAndSizeBasedRollingPolicyMock);
     whenNew(Disruptor.class).withAnyArguments().thenReturn(disruptorMock);
   }
@@ -131,7 +135,7 @@ public class DisruptorAvroFileWriterBuilderTest extends ConfiguredUnitTest {
     when(avroFileNameMock.getParent()).thenReturn(parentDirMock);
   }
 
-  @Test(expected = IllegalArgumentException.class)
+  @Test(expected = NullPointerException.class)
   public void whenANullDestinationFileAsPathIsSpecified_thenAnIllegalArgumentExceptionIsThrown() {
     disruptorAvroFileWriterBuilderUnderTest.thatWritesTo((Path) null);
   }
@@ -187,7 +191,7 @@ public class DisruptorAvroFileWriterBuilderTest extends ConfiguredUnitTest {
     thenConfiguredDestinationFileIsUsedInTheFinalWriterObject();
   }
   
-  @Test(expected = IllegalArgumentException.class)
+  @Test(expected = NullPointerException.class)
   public void whenANullDestinationFileAsStringIsSpecified_thenAnIllegalArgumentExceptionIsThrown() {
     disruptorAvroFileWriterBuilderUnderTest.thatWritesTo((String) null);
   }
@@ -264,12 +268,21 @@ public class DisruptorAvroFileWriterBuilderTest extends ConfiguredUnitTest {
   }
   
   @Test
-  public void whenTheFileRollingSizeForTheDefaultRollingPolicyIsConfigured_thenTheValueIsUsedWhenBuildingTheWriter() throws Exception {
+  public void whenAConfigurationForTheDefaultRollingPolicyIsSpecified_thenTheValueIsUsedWhenBuildingTheWriter() throws Exception {
     final OptionalSteps disruptorAvroFileWriterBuilderUnderTest = givenABuilderWithMandatoryStepsConfigured();
     
-    //disruptorAvroFileWriterBuilderUnderTest.withAFileRollingSizeOf(CONFIGURED_FILE_ROLLING_SIZE).createNewWriter();
+    disruptorAvroFileWriterBuilderUnderTest.withDefaultRollingPolicyConfiguration(DEFAULT_ROLLING_POLICY_CONFIGURATION).createNewWriter();
     
-    thenTheConfiguredRollingSizeIsUsedWhenBuildingTheWriter();
+    thenTheConfigurationForTheDefaultPolicyIsUsedWhenBuildingTheWriterObject();
+  }
+  
+  @Test
+  public void whenTheWriterIsBuilt_thenTheSpecifiedDestinationAvroFileIsRegisteredWithTheRollingPolicy() throws Exception {
+    final OptionalSteps disruptorAvroFileWriterBuilderUnderTest = givenABuilderWithMandatoryStepsConfigured();
+    
+    disruptorAvroFileWriterBuilderUnderTest.createNewWriter();
+    
+    verify(timeAndSizeBasedRollingPolicyMock).registerAvroFileName(avroFileNameMock);
   }
   
   @Test
@@ -352,7 +365,6 @@ public class DisruptorAvroFileWriterBuilderTest extends ConfiguredUnitTest {
   
   @SuppressWarnings("unchecked")
   private void verifyRollingPolicyDefaults() throws Exception {
-    verifyNew(TimeAndSizeBasedRollingPolicy.class).withArguments(50, avroFileNameMock);
     verifyNew(AvroEventConsumer.class).withArguments(any(Path.class), any(Schema.class), eq(timeAndSizeBasedRollingPolicyMock));
     verify(disruptorMock).handleEventsWith(avroEventConsumerMock);
   }
@@ -380,16 +392,19 @@ public class DisruptorAvroFileWriterBuilderTest extends ConfiguredUnitTest {
     verify(avroEventPublisherMock).startPublisherUsing(disruptorMock);
   }
 
-  @SuppressWarnings("unchecked")
   private void thenConfiguredRollingPolicyIsUsedInTheFinalWriterObject() throws Exception {
     verifyNew(AvroEventConsumer.class).withArguments(any(Path.class), any(Schema.class), eq(rollingPolicyMock));
-    verify(disruptorMock).handleEventsWith(avroEventConsumerMock);
-    verify(avroEventPublisherMock).startPublisherUsing(disruptorMock);
+    verifyWriterIsStartedWithConfiguredObjects();
+  }
+
+  private void thenTheConfigurationForTheDefaultPolicyIsUsedWhenBuildingTheWriterObject() throws Exception {
+    verifyNew(TimeAndSizeBasedRollingPolicy.class).withArguments(DEFAULT_ROLLING_POLICY_CONFIGURATION);
+    verifyNew(AvroEventConsumer.class).withArguments(any(Path.class), any(Schema.class), eq(configuredTimeAndSizeBasedRollingPolicyMock));
+    verifyWriterIsStartedWithConfiguredObjects();
   }
 
   @SuppressWarnings("unchecked")
-  private void thenTheConfiguredRollingSizeIsUsedWhenBuildingTheWriter() throws Exception {
-    verifyNew(AvroEventConsumer.class).withArguments(any(Path.class), any(Schema.class), eq(configuredTimeAndSizeBasedRollingPolicyMock));
+  private void verifyWriterIsStartedWithConfiguredObjects() {
     verify(disruptorMock).handleEventsWith(avroEventConsumerMock);
     verify(avroEventPublisherMock).startPublisherUsing(disruptorMock); 
   }

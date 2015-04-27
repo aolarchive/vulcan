@@ -82,7 +82,7 @@ public class AvroEventConsumerTest extends ConfiguredUnitTest {
   private void wireUpMocks() {
     when(avroFileNameMock.toFile()).thenReturn(avroFileNameAsFileMock);
     when(fileReaderMock.getSchema()).thenReturn(existingFileSchemaMock);
-    when(rollingPolicyMock.getNextRolledFileName(avroFileNameMock)).thenReturn(rolledFileNameMock);
+    when(rollingPolicyMock.getNextRolledFileName()).thenReturn(rolledFileNameMock);
     when(avroEventMock.getAvroRecord()).thenReturn(avroRecordMock);
   }
 
@@ -202,7 +202,7 @@ public class AvroEventConsumerTest extends ConfiguredUnitTest {
   }
 
   private void givenRollIsDue() {
-    when(rollingPolicyMock.shouldRollover(avroFileNameMock, avroRecordMock)).thenReturn(true);
+    when(rollingPolicyMock.shouldRollover(avroRecordMock)).thenReturn(true);
   }
 
   private void givenTheFileCanBeMovedSuccessfullyInTheFileSystem() throws Exception {

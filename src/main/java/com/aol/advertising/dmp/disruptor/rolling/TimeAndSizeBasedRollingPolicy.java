@@ -47,14 +47,14 @@ public class TimeAndSizeBasedRollingPolicy implements RollingPolicy {
   public TimeAndSizeBasedRollingPolicy(final DefaultRollingPolicyConfiguration configuration) {
     this.timeBasedRollingCondition = new TimeBasedRollingCondition();
     this.sizeBasedRollingCondition = new SizeBasedRollingCondition(configuration.getRollingSizeInMb());
-
-    init();
   }
 
   @Override
   public void registerAvroFileName(final Path avroFileName) {
     this.avroFileName = avroFileName;
     sizeBasedRollingCondition.registerAvroFileName(avroFileName);
+
+    init();
   }
 
   @Override
