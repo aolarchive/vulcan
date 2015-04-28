@@ -136,7 +136,7 @@ public class DisruptorAvroFileWriterBuilderTest extends ConfiguredUnitTest {
   }
 
   @Test(expected = NullPointerException.class)
-  public void whenANullDestinationFileAsPathIsSpecified_thenAnIllegalArgumentExceptionIsThrown() {
+  public void whenANullDestinationFileAsPathIsSpecified_thenANullPointerExceptionIsThrown() {
     disruptorAvroFileWriterBuilderUnderTest.thatWritesTo((Path) null);
   }
 
@@ -192,7 +192,7 @@ public class DisruptorAvroFileWriterBuilderTest extends ConfiguredUnitTest {
   }
   
   @Test(expected = NullPointerException.class)
-  public void whenANullDestinationFileAsStringIsSpecified_thenAnIllegalArgumentExceptionIsThrown() {
+  public void whenANullDestinationFileAsStringIsSpecified_thenANullPointerExceptionIsThrown() {
     disruptorAvroFileWriterBuilderUnderTest.thatWritesTo((String) null);
   }
 
