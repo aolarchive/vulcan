@@ -15,20 +15,23 @@ class SizeBasedRollingCondition {
   private static final double DECAY_RATE = 0.2;
   private static final double DECAY_RATE_COMPLEMENT = 1.0 - DECAY_RATE;
 
-  private final Path avroFileName;
   private final int rolloverTriggeringSizeInBytes;
 
+  private Path avroFileName;
   private int recordsInCurrentFile;
   private RolloverShouldHappen delegateImplementation;
   private double writeRate;
   
-  SizeBasedRollingCondition(final Path avroFileName, int rolloverTriggeringSizeInMB) {
+  SizeBasedRollingCondition(int rolloverTriggeringSizeInMB) {
     this.rolloverTriggeringSizeInBytes = rolloverTriggeringSizeInMB * ONE_MB_IN_BYTES;
-    this.avroFileName = avroFileName;
 
     this.recordsInCurrentFile = 0;
     this.delegateImplementation = getWarmupDelegateImplementation();
     this.writeRate = 0.0;
+  }
+
+  void registerAvroFileName(final Path avroFileName) {
+    this.avroFileName = avroFileName;
   }
 
   private RolloverShouldHappen getWarmupDelegateImplementation() {

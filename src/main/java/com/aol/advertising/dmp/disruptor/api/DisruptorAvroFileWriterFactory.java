@@ -1,10 +1,10 @@
 package com.aol.advertising.dmp.disruptor.api;
 
-import java.nio.file.Path;
-
 import org.apache.avro.Schema;
 
 import com.aol.advertising.dmp.disruptor.api.builder.steps.OptionalSteps;
+import com.aol.advertising.dmp.disruptor.api.rolling.RollingPolicy;
+import com.aol.advertising.dmp.disruptor.rolling.TimeAndSizeBasedRollingPolicyConfig;
 import com.lmax.disruptor.WaitStrategy;
 import com.lmax.disruptor.dsl.ProducerType;
 
@@ -15,12 +15,13 @@ import com.lmax.disruptor.dsl.ProducerType;
  */
 public class DisruptorAvroFileWriterFactory {
 
-  private Path avroFileName;
+  private String avroFileName;
   private Schema avroSchema;
   private int ringBufferSize;
   private ProducerType producerType;
   private WaitStrategy waitStrategy;
   private RollingPolicy rollingPolicy;
+  private TimeAndSizeBasedRollingPolicyConfig defaultRollingPolicyConfiguration;
   
   public DisruptorAvroFileWriter createNewWriter() {
     final OptionalSteps writerBuilder = DisruptorAvroFileWriterBuilder.startCreatingANewWriter()
@@ -35,6 +36,9 @@ public class DisruptorAvroFileWriterFactory {
     if (waitStrategy != null) {
       writerBuilder.withWaitStrategy(waitStrategy);
     }
+    if (defaultRollingPolicyConfiguration != null) {
+      writerBuilder.withDefaultRollingPolicyConfiguration(defaultRollingPolicyConfiguration);
+    }
     if (rollingPolicy != null) {
       writerBuilder.withRollingPolicy(rollingPolicy);
     }
@@ -42,7 +46,7 @@ public class DisruptorAvroFileWriterFactory {
   }
 
 
-  public void setAvroFileName(final Path avroFileName) {
+  public void setAvroFileName(final String avroFileName) {
     this.avroFileName = avroFileName;
   }
 
@@ -62,8 +66,11 @@ public class DisruptorAvroFileWriterFactory {
     this.waitStrategy = waitStrategy;
   }
 
+  public void setDefaultRollingPolicyConfiguration(TimeAndSizeBasedRollingPolicyConfig configuration) {
+    this.defaultRollingPolicyConfiguration = configuration;
+  }
+
   public void setRollingPolicy(final RollingPolicy rollingPolicy) {
     this.rollingPolicy = rollingPolicy;
   }
-
 }

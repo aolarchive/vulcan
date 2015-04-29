@@ -23,17 +23,19 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import org.mockito.Spy;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
+import com.aol.advertising.dmp.disruptor.ConfiguredUnitTest;
 import com.aol.advertising.dmp.disruptor.api.builder.steps.AvroFileNameStep;
 import com.aol.advertising.dmp.disruptor.api.builder.steps.OptionalSteps;
+import com.aol.advertising.dmp.disruptor.api.rolling.RollingPolicy;
 import com.aol.advertising.dmp.disruptor.exception.DisruptorExceptionHandler;
 import com.aol.advertising.dmp.disruptor.ringbuffer.AvroEvent;
 import com.aol.advertising.dmp.disruptor.ringbuffer.AvroEventFactory;
 import com.aol.advertising.dmp.disruptor.rolling.TimeAndSizeBasedRollingPolicy;
+import com.aol.advertising.dmp.disruptor.rolling.TimeAndSizeBasedRollingPolicyConfig;
 import com.aol.advertising.dmp.disruptor.writer.AvroEventConsumer;
 import com.aol.advertising.dmp.disruptor.writer.AvroEventPublisher;
 import com.lmax.disruptor.SleepingWaitStrategy;
@@ -41,13 +43,17 @@ import com.lmax.disruptor.WaitStrategy;
 import com.lmax.disruptor.dsl.Disruptor;
 import com.lmax.disruptor.dsl.ProducerType;
 
+// @formatter:off
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({AvroEventPublisher.class, AvroEventConsumer.class, TimeAndSizeBasedRollingPolicy.class,
                  Disruptor.class, ProducerType.class, Files.class, DisruptorAvroFileWriterBuilder.class,
                  Paths.class})
-public class DisruptorAvroFileWriterBuilderTest {
+// @formatter:on
+public class DisruptorAvroFileWriterBuilderTest extends ConfiguredUnitTest {
 
   private static final String AVRO_FILE_NAME = "Pizza dough";
+  private static final TimeAndSizeBasedRollingPolicyConfig ROLLING_POLICY_CONFIGURATION =
+      new TimeAndSizeBasedRollingPolicyConfig().withFileRollingSizeOf(345);
 
   private AvroFileNameStep disruptorAvroFileWriterBuilderUnderTest;
 
@@ -77,6 +83,8 @@ public class DisruptorAvroFileWriterBuilderTest {
   private WaitStrategy waitStrategyMock;
   @Mock
   private RollingPolicy rollingPolicyMock;
+  @Mock
+  private TimeAndSizeBasedRollingPolicy configuredTimeAndSizeBasedRollingPolicyMock;
 
   @Before
   public void setUp() throws Exception {
@@ -87,7 +95,6 @@ public class DisruptorAvroFileWriterBuilderTest {
   }
   
   private void initMocks() throws Exception {
-    MockitoAnnotations.initMocks(this);
     mockStatic(Files.class);
     mockPaths();
     mockConstructors();
@@ -103,6 +110,8 @@ public class DisruptorAvroFileWriterBuilderTest {
     whenNew(AvroEventPublisher.class).withAnyArguments().thenReturn(avroEventPublisherMock);
     whenNew(AvroEventConsumer.class).withAnyArguments().thenReturn(avroEventConsumerMock);
     whenNew(TimeAndSizeBasedRollingPolicy.class).withAnyArguments().thenReturn(timeAndSizeBasedRollingPolicyMock);
+    whenNew(TimeAndSizeBasedRollingPolicy.class).withArguments(ROLLING_POLICY_CONFIGURATION)
+                                                .thenReturn(configuredTimeAndSizeBasedRollingPolicyMock);
     whenNew(Disruptor.class).withAnyArguments().thenReturn(disruptorMock);
   }
 
@@ -126,20 +135,9 @@ public class DisruptorAvroFileWriterBuilderTest {
     when(avroFileNameMock.getParent()).thenReturn(parentDirMock);
   }
 
-  @Test(expected = IllegalArgumentException.class)
-  public void whenANullDestinationFileIsSpecified_thenAnIllegalArgumentExceptionIsThrown() {
+  @Test(expected = NullPointerException.class)
+  public void whenANullDestinationFileAsPathIsSpecified_thenANullPointerExceptionIsThrown() {
     disruptorAvroFileWriterBuilderUnderTest.thatWritesTo((Path) null);
-  }
-  
-  // TODO: A data-driven test should be used instead of this delegation check, I couldn't make
-  // JunitParams work together with PowerMock though. This needs more investigation to see if they
-  // can be made to work together or maybe the test should use the default parameterized JUnit tests
-  // (not recommended)
-  @Test
-  public void whenDestinationFileIsSpecifiedAsString_thenBuildProcessIsDelegatedToThePathInterface() {
-    spyOnDisruptorAvroFileWriterBuilder.thatWritesTo(AVRO_FILE_NAME);
-
-    verify(spyOnDisruptorAvroFileWriterBuilder.thatWritesTo(avroFileNameMock));
   }
 
   @Test(expected = IllegalArgumentException.class)
@@ -193,6 +191,22 @@ public class DisruptorAvroFileWriterBuilderTest {
     thenConfiguredDestinationFileIsUsedInTheFinalWriterObject();
   }
   
+  @Test(expected = NullPointerException.class)
+  public void whenANullDestinationFileAsStringIsSpecified_thenANullPointerExceptionIsThrown() {
+    disruptorAvroFileWriterBuilderUnderTest.thatWritesTo((String) null);
+  }
+
+  // TODO: A data-driven test should be used instead of this delegation check, I couldn't make
+  // JunitParams work together with PowerMock though. This needs more investigation to see if they
+  // can be made to work together or maybe the test should use the default parameterized JUnit tests
+  // (not recommended)
+  @Test
+  public void whenDestinationFileIsSpecifiedAsString_thenBuildProcessIsDelegatedToThePathInterface() {
+    spyOnDisruptorAvroFileWriterBuilder.thatWritesTo(AVRO_FILE_NAME);
+
+    verify(spyOnDisruptorAvroFileWriterBuilder.thatWritesTo(avroFileNameMock));
+  }
+
   @Test(expected = IllegalArgumentException.class)
   public void whenANullSchemaIsSpecified_thenAnIllegalArgumentExceptionIsThrown() {
     disruptorAvroFileWriterBuilderUnderTest.thatWritesTo(avroFileNameMock).thatWritesRecordsOf(null);
@@ -252,7 +266,26 @@ public class DisruptorAvroFileWriterBuilderTest {
 
     thenConfiguredRollingPolicyIsUsedInTheFinalWriterObject();
   }
-
+  
+  @Test
+  public void whenAConfigurationForTheDefaultRollingPolicyIsSpecified_thenTheValueIsUsedWhenBuildingTheWriter() throws Exception {
+    final OptionalSteps disruptorAvroFileWriterBuilderUnderTest = givenABuilderWithMandatoryStepsConfigured();
+    
+    disruptorAvroFileWriterBuilderUnderTest.withDefaultRollingPolicyConfiguration(
+        ROLLING_POLICY_CONFIGURATION).createNewWriter();
+    
+    thenTheConfigurationForTheDefaultPolicyIsUsedWhenBuildingTheWriterObject();
+  }
+  
+  @Test
+  public void whenTheWriterIsBuilt_thenTheSpecifiedDestinationAvroFileIsRegisteredWithTheRollingPolicy() throws Exception {
+    final OptionalSteps disruptorAvroFileWriterBuilderUnderTest = givenABuilderWithMandatoryStepsConfigured();
+    
+    disruptorAvroFileWriterBuilderUnderTest.createNewWriter();
+    
+    verify(timeAndSizeBasedRollingPolicyMock).registerAvroFileName(avroFileNameMock);
+  }
+  
   @Test
   public void whenTheWriterIsBuilt_thenExceptionsWithinDisruptorAreHandledWithADisruptorExceptionHandler() throws Exception {
     final OptionalSteps disruptorAvroFileWriterBuilderUnderTest = givenABuilderWithMandatoryStepsConfigured();
@@ -333,7 +366,6 @@ public class DisruptorAvroFileWriterBuilderTest {
   
   @SuppressWarnings("unchecked")
   private void verifyRollingPolicyDefaults() throws Exception {
-    verifyNew(TimeAndSizeBasedRollingPolicy.class).withArguments(50, avroFileNameMock);
     verifyNew(AvroEventConsumer.class).withArguments(any(Path.class), any(Schema.class), eq(timeAndSizeBasedRollingPolicyMock));
     verify(disruptorMock).handleEventsWith(avroEventConsumerMock);
   }
@@ -361,9 +393,19 @@ public class DisruptorAvroFileWriterBuilderTest {
     verify(avroEventPublisherMock).startPublisherUsing(disruptorMock);
   }
 
-  @SuppressWarnings("unchecked")
   private void thenConfiguredRollingPolicyIsUsedInTheFinalWriterObject() throws Exception {
     verifyNew(AvroEventConsumer.class).withArguments(any(Path.class), any(Schema.class), eq(rollingPolicyMock));
+    verifyWriterIsStartedWithConfiguredObjects();
+  }
+
+  private void thenTheConfigurationForTheDefaultPolicyIsUsedWhenBuildingTheWriterObject() throws Exception {
+    verifyNew(TimeAndSizeBasedRollingPolicy.class).withArguments(ROLLING_POLICY_CONFIGURATION);
+    verifyNew(AvroEventConsumer.class).withArguments(any(Path.class), any(Schema.class), eq(configuredTimeAndSizeBasedRollingPolicyMock));
+    verifyWriterIsStartedWithConfiguredObjects();
+  }
+
+  @SuppressWarnings("unchecked")
+  private void verifyWriterIsStartedWithConfiguredObjects() {
     verify(disruptorMock).handleEventsWith(avroEventConsumerMock);
     verify(avroEventPublisherMock).startPublisherUsing(disruptorMock);
   }

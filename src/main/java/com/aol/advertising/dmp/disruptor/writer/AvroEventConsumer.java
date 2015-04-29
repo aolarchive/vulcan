@@ -11,7 +11,7 @@ import org.apache.avro.generic.GenericDatumReader;
 import org.apache.avro.specific.SpecificDatumWriter;
 import org.apache.avro.specific.SpecificRecord;
 
-import com.aol.advertising.dmp.disruptor.api.RollingPolicy;
+import com.aol.advertising.dmp.disruptor.api.rolling.RollingPolicy;
 import com.aol.advertising.dmp.disruptor.exception.FileRollingException;
 import com.aol.advertising.dmp.disruptor.ringbuffer.AvroEvent;
 import com.aol.advertising.dmp.disruptor.utils.FilesOpsFacade;
@@ -106,7 +106,7 @@ public class AvroEventConsumer implements EventHandler<AvroEvent>, LifecycleAwar
   }
 
   private void applyRollingPolicy(final SpecificRecord avroRecord) throws IOException {
-    if (rollingPolicy.shouldRollover(avroFileName, avroRecord)) {
+    if (rollingPolicy.shouldRollover(avroRecord)) {
       rollFile();
     }
   }
@@ -121,7 +121,7 @@ public class AvroEventConsumer implements EventHandler<AvroEvent>, LifecycleAwar
   }
 
   private void renameAvroFile() {
-    final Path nextRolledFileName = rollingPolicy.getNextRolledFileName(avroFileName);
+    final Path nextRolledFileName = rollingPolicy.getNextRolledFileName();
     try {
       FilesOpsFacade.facadeInstance.move(avroFileName, nextRolledFileName, StandardCopyOption.REPLACE_EXISTING);
     } catch (IOException e) {

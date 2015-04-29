@@ -6,6 +6,7 @@ import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.powermock.api.mockito.PowerMockito.mockStatic;
+import static org.powermock.api.mockito.PowerMockito.verifyNew;
 import static org.powermock.api.mockito.PowerMockito.whenNew;
 
 import java.nio.file.DirectoryStream;
@@ -24,16 +25,19 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Answers;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
+import com.aol.advertising.dmp.disruptor.ConfiguredUnitTest;
+
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({Files.class, TimeBasedRollingCondition.class, SizeBasedRollingCondition.class, TimeAndSizeBasedRollingPolicy.class})
-public class TimeAndSizeBasedRollingPolicyTest {
+public class TimeAndSizeBasedRollingPolicyTest extends ConfiguredUnitTest {
 
-  private static final int ROLLOVER_SIZE = 42;
   private static final String AVRO_FILE_NAME = "MonsterTruckMadness";
+  private static final int ROLLOVER_SIZE = 42;
+  private static final TimeAndSizeBasedRollingPolicyConfig ROLLING_POLICY_CONFIGURATION =
+      new TimeAndSizeBasedRollingPolicyConfig().withFileRollingSizeOf(ROLLOVER_SIZE);
 
   private TimeAndSizeBasedRollingPolicy timeAndSizeBasedRollingPolicyUnderTest;
 
@@ -57,13 +61,12 @@ public class TimeAndSizeBasedRollingPolicyTest {
   }
 
   private void initMocks() throws Exception {
-    MockitoAnnotations.initMocks(this);
     mockStatic(Files.class);
     mockStatic(TimeBasedRollingCondition.class);
     mockStatic(SizeBasedRollingCondition.class);
     
     whenNew(TimeBasedRollingCondition.class).withNoArguments().thenReturn(timeBasedRollingConditionMock);
-    whenNew(SizeBasedRollingCondition.class).withArguments(avroFileNameMock, ROLLOVER_SIZE).thenReturn(sizeBasedRollingConditionMock);
+    whenNew(SizeBasedRollingCondition.class).withAnyArguments().thenReturn(sizeBasedRollingConditionMock);
     when(avroFileNameMock.getFileName().toString()).thenReturn(AVRO_FILE_NAME);
     when(avroFileNameMock.getFileSystem().getSeparator()).thenReturn("/");
   }
@@ -75,19 +78,26 @@ public class TimeAndSizeBasedRollingPolicyTest {
   }
 
   @Test
+  public void whenThePolicyIsInitialized_thenSizeBasedConditionIsBuiltWithTheConfiguredRollingSize() throws Exception {
+    whenThePolicyIsInitialized();
+
+    verifyNew(SizeBasedRollingCondition.class).withArguments(ROLLING_POLICY_CONFIGURATION.getRollingSizeInMb());
+  }
+
+  @Test
   public void whenThePolicyIsInitialized_thenTheRollingIndexContinuesWhereWeLeftOff() {
     givenTheMaximumIndexInTheDirIs20();
     
-    final TimeAndSizeBasedRollingPolicy timeAndSizeBasedRollingPolicyUnderTest = new TimeAndSizeBasedRollingPolicy(ROLLOVER_SIZE, avroFileNameMock);
+    whenThePolicyIsInitialized();
     
-    thenTheRollingIndexContinuesWhereWeLeftOff(timeAndSizeBasedRollingPolicyUnderTest);
+    thenTheRollingIndexContinuesWhereWeLeftOff();
   }
   
   @Test
   public void shouldRolloverDecisionIsDelegatedToConditions() {
     givenThePolicyIsInitialized();
     
-    timeAndSizeBasedRollingPolicyUnderTest.shouldRollover(null, null);
+    timeAndSizeBasedRollingPolicyUnderTest.shouldRollover(null);
     
     thenDecisionIsDelegatedToConditions();
   }
@@ -96,7 +106,7 @@ public class TimeAndSizeBasedRollingPolicyTest {
   public void whenTheNextRolledFileNameIsRetrieved_thenTheObtainedNameFollowsTheExpectedPattern() {
     givenThePolicyIsInitialized();
 
-    final Path generatedName = timeAndSizeBasedRollingPolicyUnderTest.getNextRolledFileName(null);
+    final Path generatedName = timeAndSizeBasedRollingPolicyUnderTest.getNextRolledFileName();
 
     thenObtainedNameFollowsTheExpectedPattern(generatedName);
   }
@@ -106,7 +116,7 @@ public class TimeAndSizeBasedRollingPolicyTest {
     givenThePolicyIsInitialized();
     givenTimeBasedRollIsDue();
     
-    final DateTime date = getDateTimeFrom(timeAndSizeBasedRollingPolicyUnderTest.getNextRolledFileName(null));
+    final DateTime date = getDateTimeFrom(timeAndSizeBasedRollingPolicyUnderTest.getNextRolledFileName());
     
     assertThat(date, is(equalTo(DateTime.now().minusDays(1).withTimeAtStartOfDay())));
   }
@@ -115,7 +125,7 @@ public class TimeAndSizeBasedRollingPolicyTest {
   public void whenTheNextRolledFileNameIsRetrieved_andTimeBasedRollIsNotDue_thenRolledFileNameDateIsToday() {
     givenThePolicyIsInitialized();
     
-    final DateTime date = getDateTimeFrom(timeAndSizeBasedRollingPolicyUnderTest.getNextRolledFileName(null));
+    final DateTime date = getDateTimeFrom(timeAndSizeBasedRollingPolicyUnderTest.getNextRolledFileName());
     
     assertThat(date, is(equalTo(DateTime.now().withTimeAtStartOfDay())));
   }
@@ -127,7 +137,7 @@ public class TimeAndSizeBasedRollingPolicyTest {
     givenFiledIsRolled();
     givenTimeBasedRollIsNotDue();
 
-    final int index = getIndexFrom(timeAndSizeBasedRollingPolicyUnderTest.getNextRolledFileName(null));
+    final int index = getIndexFrom(timeAndSizeBasedRollingPolicyUnderTest.getNextRolledFileName());
 
     assertThat(index, is(equalTo(0)));
   }
@@ -136,9 +146,9 @@ public class TimeAndSizeBasedRollingPolicyTest {
   public void whenTheNextRolledFileNameIsRetrieved_andTimeBasedRollIsNotDue_thenTheIndexOfTheRolledFileNameIsIncreasedByOne() {
     givenThePolicyIsInitialized();
     givenTimeBasedRollIsNotDue();
-    final int initialIndex = getIndexFrom(timeAndSizeBasedRollingPolicyUnderTest.getNextRolledFileName(null));
+    final int initialIndex = getIndexFrom(timeAndSizeBasedRollingPolicyUnderTest.getNextRolledFileName());
 
-    final int finalIndex = getIndexFrom(timeAndSizeBasedRollingPolicyUnderTest.getNextRolledFileName(null));
+    final int finalIndex = getIndexFrom(timeAndSizeBasedRollingPolicyUnderTest.getNextRolledFileName());
     
     assertThat(finalIndex, is(equalTo(initialIndex + 1)));
   }
@@ -147,7 +157,7 @@ public class TimeAndSizeBasedRollingPolicyTest {
   public void whenTheNextRolledFileNameIsRetrieved_thenInfoAboutARolloverEventIsPropagatedToConditions() {
     givenThePolicyIsInitialized();
 
-    timeAndSizeBasedRollingPolicyUnderTest.getNextRolledFileName(null);
+    timeAndSizeBasedRollingPolicyUnderTest.getNextRolledFileName();
 
     thenInfoAboutTheEventIsPropagatedToConditions();
   }
@@ -160,7 +170,8 @@ public class TimeAndSizeBasedRollingPolicyTest {
   }
   
   private void givenThePolicyIsInitialized() {
-    timeAndSizeBasedRollingPolicyUnderTest = new TimeAndSizeBasedRollingPolicy(ROLLOVER_SIZE, avroFileNameMock);
+    timeAndSizeBasedRollingPolicyUnderTest = new TimeAndSizeBasedRollingPolicy(ROLLING_POLICY_CONFIGURATION);
+    timeAndSizeBasedRollingPolicyUnderTest.registerAvroFileName(avroFileNameMock);
   }
   
   private void givenTimeBasedRollIsDue() {
@@ -168,16 +179,20 @@ public class TimeAndSizeBasedRollingPolicyTest {
   }
   
   private void givenFiledIsRolled() {
-    timeAndSizeBasedRollingPolicyUnderTest.getNextRolledFileName(null);
+    timeAndSizeBasedRollingPolicyUnderTest.getNextRolledFileName();
   }
 
   private void givenTimeBasedRollIsNotDue() {
     when(timeBasedRollingConditionMock.lastRolloverHappenedBeforeToday()).thenReturn(false);
   }
 
-  private void thenTheRollingIndexContinuesWhereWeLeftOff(TimeAndSizeBasedRollingPolicy timeAndSizeBasedRollingPolicyUnderTest) {
-    final int nextIndex = getIndexFrom(timeAndSizeBasedRollingPolicyUnderTest.getNextRolledFileName(null));
+  private void thenTheRollingIndexContinuesWhereWeLeftOff() {
+    final int nextIndex = getIndexFrom(timeAndSizeBasedRollingPolicyUnderTest.getNextRolledFileName());
     assertThat(nextIndex, is(equalTo(20 + 1)));
+  }
+
+  private void whenThePolicyIsInitialized() {
+    givenThePolicyIsInitialized();
   }
 
   private void thenDecisionIsDelegatedToConditions() {

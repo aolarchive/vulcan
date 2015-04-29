@@ -17,7 +17,7 @@ import org.joda.time.format.DateTimeFormatter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.aol.advertising.dmp.disruptor.api.RollingPolicy;
+import com.aol.advertising.dmp.disruptor.api.rolling.RollingPolicy;
 
 /**
  * Rolled files names are indexed beginning at 0.
@@ -39,26 +39,31 @@ public class TimeAndSizeBasedRollingPolicy implements RollingPolicy {
 
   private final TimeBasedRollingCondition timeBasedRollingCondition;
   private final SizeBasedRollingCondition sizeBasedRollingCondition;
-  private final Path avroFileName;
 
+  private Path avroFileName;
   private int rollingIndex;
 
-  public TimeAndSizeBasedRollingPolicy(int rolloverTriggeringSizeInMB, final Path avroFileName) {
+  public TimeAndSizeBasedRollingPolicy(final TimeAndSizeBasedRollingPolicyConfig configuration) {
     this.timeBasedRollingCondition = new TimeBasedRollingCondition();
-    this.sizeBasedRollingCondition = new SizeBasedRollingCondition(avroFileName, rolloverTriggeringSizeInMB);
+    this.sizeBasedRollingCondition = new SizeBasedRollingCondition(configuration.getRollingSizeInMb());
+  }
+
+  @Override
+  public void registerAvroFileName(final Path avroFileName) {
     this.avroFileName = avroFileName;
+    sizeBasedRollingCondition.registerAvroFileName(avroFileName);
 
     init();
   }
 
   @Override
-  public boolean shouldRollover(final Path _, final SpecificRecord avroRecord) {
+  public boolean shouldRollover(final SpecificRecord avroRecord) {
     return sizeBasedRollingCondition.sizeThresholdHasBeenHit() || timeBasedRollingCondition.lastRolloverHappenedBeforeToday();
   }
 
   @Override
   // Format: <path_to_file><file_name_minus_extension>-yyyy-MM-dd.index.log
-  public Path getNextRolledFileName(final Path _) {
+  public Path getNextRolledFileName() {
     final DateTime nextDateTimeToUse = chooseNextDateTimeToUse();
     final Path nextRolledFileName = Paths.get(avroFileName.getParent().toString(), avroFileName.getFileSystem().getSeparator()
                                                           + removeFileExtensionFrom(avroFileName)

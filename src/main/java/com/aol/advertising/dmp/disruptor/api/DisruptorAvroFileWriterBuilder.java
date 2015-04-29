@@ -1,6 +1,5 @@
 package com.aol.advertising.dmp.disruptor.api;
 
-import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -16,9 +15,11 @@ import com.aol.advertising.dmp.disruptor.api.builder.steps.AvroFileNameStep;
 import com.aol.advertising.dmp.disruptor.api.builder.steps.AvroSchemaStep;
 import com.aol.advertising.dmp.disruptor.api.builder.steps.OptionalSteps;
 import com.aol.advertising.dmp.disruptor.api.builder.steps.Steps;
+import com.aol.advertising.dmp.disruptor.api.rolling.RollingPolicy;
 import com.aol.advertising.dmp.disruptor.exception.DisruptorExceptionHandler;
 import com.aol.advertising.dmp.disruptor.ringbuffer.AvroEvent;
 import com.aol.advertising.dmp.disruptor.ringbuffer.AvroEventFactory;
+import com.aol.advertising.dmp.disruptor.rolling.TimeAndSizeBasedRollingPolicyConfig;
 import com.aol.advertising.dmp.disruptor.rolling.TimeAndSizeBasedRollingPolicy;
 import com.aol.advertising.dmp.disruptor.writer.AvroEventConsumer;
 import com.aol.advertising.dmp.disruptor.writer.AvroEventPublisher;
@@ -79,13 +80,13 @@ public class DisruptorAvroFileWriterBuilder implements Steps {
   public AvroSchemaStep thatWritesTo(final Path avroFileName) {
     this.avroFileName = avroFileName;
     validateFile();
-    initDefaultRollingPolicy();
+    initRollingPolicyWithDefaultConfiguration();
     return this;
   }
 
   private void validateFile() {
     if (avroFileName == null) {
-      throw new IllegalArgumentException("Specified Avro file was null");
+      throw new NullPointerException("Specified Avro file was null");
     }
     if (Files.exists(avroFileName)) {
       validateFileIsNotADir();
@@ -123,20 +124,15 @@ public class DisruptorAvroFileWriterBuilder implements Steps {
     }
   }
 
-  private void initDefaultRollingPolicy() {
-    try {
-      tryToInitDefaultRollingPolicy();
-    } catch (IOException ioe) {
-      throw new IllegalArgumentException(ioe);
-    }
-  }
-
-  private void tryToInitDefaultRollingPolicy() throws IOException {
-    rollingPolicy = new TimeAndSizeBasedRollingPolicy(50, avroFileName);
+  private void initRollingPolicyWithDefaultConfiguration() {
+    rollingPolicy = new TimeAndSizeBasedRollingPolicy(new TimeAndSizeBasedRollingPolicyConfig());
   }
 
   @Override
   public AvroSchemaStep thatWritesTo(final String avroFileName) {
+    if (avroFileName == null) {
+      throw new NullPointerException("Specified Avro file was null");
+    }
     return thatWritesTo(Paths.get(avroFileName));
   }
 
@@ -186,7 +182,14 @@ public class DisruptorAvroFileWriterBuilder implements Steps {
   }
 
   @Override
+  public OptionalSteps withDefaultRollingPolicyConfiguration(final TimeAndSizeBasedRollingPolicyConfig configuration) {
+    rollingPolicy = new TimeAndSizeBasedRollingPolicy(configuration);
+    return this;
+  }
+
+  @Override
   public DisruptorAvroFileWriter createNewWriter() {
+    rollingPolicy.registerAvroFileName(avroFileName);
     publisherUnderConstruction.registerConsumerExecutorForShutdown(consumerExecutor);
     publisherUnderConstruction.startPublisherUsing(buildDisruptor());
     return publisherUnderConstruction;

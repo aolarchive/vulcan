@@ -12,14 +12,15 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.powermock.reflect.Whitebox;
 
+import com.aol.advertising.dmp.disruptor.ConfiguredUnitTest;
+
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({DateTime.class, TimeBasedRollingCondition.class})
-public class TimeBasedRollingConditionTest {
+public class TimeBasedRollingConditionTest extends ConfiguredUnitTest {
 
   private TimeBasedRollingCondition timeBasedRollingConditionUnderTest;
 
@@ -38,7 +39,6 @@ public class TimeBasedRollingConditionTest {
   }
 
   private void initMocks() throws Exception {
-    MockitoAnnotations.initMocks(this);
     mockStatic(DateTime.class);
 
     when(DateTime.now()).thenReturn(lastRollDateTimeMock, nowMock);
