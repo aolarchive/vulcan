@@ -38,12 +38,15 @@ public class SizeBasedRollingConditionTest extends ConfiguredUnitTest {
   @Before
   public void setUp() throws Exception {
     initMocks();
+
     sizeBasedRollingConditionUnderTest = new SizeBasedRollingCondition(ROLLING_POLICY_CONFIGURATION.getRollingSizeInMb());
     sizeBasedRollingConditionUnderTest.registerAvroFileName(avroFileNameMock);
   }
 
+  @SuppressWarnings("unchecked")
   private void initMocks() throws Exception {
     mockStatic(Files.class);
+    when(Files.exists(null)).thenThrow(NullPointerException.class);
   }
   
   @Test
