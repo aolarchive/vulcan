@@ -26,12 +26,12 @@ class SizeBasedRollingCondition {
     this.rolloverTriggeringSizeInBytes = rolloverTriggeringSizeInMB * ONE_MB_IN_BYTES;
 
     this.recordsInCurrentFile = 0;
-    this.delegateImplementation = getWarmupDelegateImplementation();
     this.writeRate = 0.0;
   }
 
   void registerAvroFileName(final Path avroFileName) {
     this.avroFileName = avroFileName;
+    this.delegateImplementation = getWarmupDelegateImplementation();
   }
 
   private RolloverShouldHappen getWarmupDelegateImplementation() {
