@@ -1,8 +1,9 @@
 # Disruptor Avro Writer
-The Disruptor Avro Writer library is an AOL project that provides a specialized, asynchronous version of the Avro writer in [Apache's Java Avro library](http://avro.apache.org/docs/current/gettingstartedjava.html).
+The Disruptor Avro Writer library is an AOL project that provides a specialized, asynchronous version of the Avro writer
+in [Apache's Java Avro library](http://avro.apache.org/docs/current/gettingstartedjava.html).
 
-By wrapping Apache's writer with an [LMAX Disruptor](https://lmax-exchange.github.io/disruptor/) front-end, our library allows client code to write Avro objects to disk taking
- advantage of the high-throughput, low-latency achieved by Disruptor.
+By wrapping Apache's writer with an [LMAX Disruptor](https://lmax-exchange.github.io/disruptor/) front-end, our library
+allows client code to write Avro objects to disk taking advantage of the high-throughput, low-latency achieved by Disruptor.
  
 ## How to get it
 Add the following Maven dependency to your project:
@@ -32,16 +33,22 @@ public interface DisruptorAvroFileWriter extends AutoCloseable {
 }
 ```
 
-A builder and a factory are provided to obtain instances of DisruptorAvroFileWriter. The target file is specified when obtaining an instance and the writer will be bound to that
-file for the rest of its lifecycle.
+A builder and a factory are provided to obtain instances of DisruptorAvroFileWriter. The target file is specified when
+obtaining an instance and the writer will be bound to that file for the rest of its lifecycle.
 
-You shouldn't use multiple writers to write to the same file as that can lead to concurrency problems. Note that writer instances are thread-safe (with the default configuration, more on this later) and can be safely called from multiple threads, so the right approach is to have all your threads writing to the same destination file share the same writer singleton. On the other hand, the builder and the factory are designed to be used only during your application startup/wiring to provide the necessary writers and are not thread-safe (these design patterns are typically not thread-safe anyway).
+You shouldn't use multiple writers to write to the same file as that can lead to concurrency problems. Note that writer
+instances are thread-safe (with the default configuration, more on this later) and can be safely called from multiple threads,
+so the right approach is to have all your threads writing to the same destination file share the same writer singleton.
+On the other hand, the builder and the factory are designed to be used only during your application startup/wiring to
+provide the necessary writers and are not thread-safe (these design patterns are typically not thread-safe anyway).
 
 The DisruptorAvroFileWriter *close* method should be called when shutting down your application in order to flush any remaining objects into disk.
 
 ### Using the builder
-The builder API provides a DSL suitable for standalone applications with no dependency injection or for programmatic configuration styles such as Spring's Java-based configuration. As mentioned earlier, writers have a 1:1 relationship with the destination files, so when building a new instance you need to specify both the destination
-file path and the Avro schema that will be used to serialize the Avro objects. The following code snippet shows an example on how to get a writer instance:
+The builder API provides a DSL suitable for standalone applications with no dependency injection or for programmatic
+configuration styles such as Spring's Java-based configuration. As mentioned earlier, writers have a 1:1 relationship
+with the destination files, so when building a new instance you need to specify both the destination file path and the
+Avro schema that will be used to serialize the Avro objects. The following code snippet shows an example on how to get a writer instance:
 
 ```java
     DisruptorAvroFileWriterBuilder.startCreatingANewWriter()
@@ -70,7 +77,8 @@ The builder also contains optional steps to customize the Disruptor used:
     
    ```
  
-  Keep in mind that changing the type from MULTI to SINGLE will improve writer instances performance slightly but will render them **non thread-safe**.
+  Keep in mind that changing the type from MULTI to SINGLE will improve writer instances performance slightly but will
+  render them **non thread-safe**.
   * Buffer consumer write strategy. Default is [SleepingWaitStrategy](https://lmax-exchange.github.io/disruptor/docs/com/lmax/disruptor/SleepingWaitStrategy.html)
 
    ```java
@@ -79,8 +87,9 @@ The builder also contains optional steps to customize the Disruptor used:
    ```
    
 Finally, the writer can be configured on how to roll the Avro files. By default, a time and size policy is used, similar to
-[SizeAndTimeBasedFNATP](http://logback.qos.ch/apidocs/ch/qos/logback/core/rolling/SizeAndTimeBasedFNATP.html) in the Logback logging library. Time-based rolling will happen
-every night at midnight. Size-based rolling will happen by default when a size of 50Mb is reached. This size can be configured using the TimeAndSizeBasedRollingPolicyConfig class:
+[SizeAndTimeBasedFNATP](http://logback.qos.ch/apidocs/ch/qos/logback/core/rolling/SizeAndTimeBasedFNATP.html) in the
+Logback logging library. Time-based rolling will happen every night at midnight. Size-based rolling will happen by
+default when a size of 50Mb is reached. This size can be configured using the TimeAndSizeBasedRollingPolicyConfig class:
 
 ```java
     final TimeAndSizeBasedRollingPolicyConfig defaultRollingPolicyConfig =
@@ -101,8 +110,9 @@ You can also fully override the rolling behavior by implementing your own versio
 ```
 
 ### Using the factory
-This API is suitable for applications with dependency injection and declarative configuration styles such as Spring's XML-based configuration. This API is simply a wrapper around
-the builder and offers the same operations via settable bean properties. For example, you could use the factory in a Spring XML config file as follows:
+This API is suitable for applications with dependency injection and declarative configuration styles such as Spring's
+XML-based configuration. This API is simply a wrapper around the builder and offers the same operations via settable
+bean properties. For example, you could use the factory in a Spring XML config file as follows:
 
 ```xml
   <bean id="disruptorAvroFileWriterFactory"
