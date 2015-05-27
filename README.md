@@ -16,8 +16,9 @@ Add the following Maven dependency to your project:
     
 ## Overview
 The library provides the following:
-  * Efficient, asynchronous serialization of Avro objects into disk.
-  * Customizable rolling management of the generated files.
+
+* Efficient, asynchronous serialization of Avro objects into disk.
+* Customizable rolling management of the generated files.
 
 ## API
 The library contains a DisruptorAvroFileWriter interface with a single method *write* that writes a given Avro record to a file in disk.
@@ -63,28 +64,29 @@ these have been called.
 
 The builder also contains optional steps to customize the Disruptor used:
 
-  * Ring buffer size. Default is 2048 entries:
+* Ring buffer size. Default is 2048 entries:
  
-   ```java
-    public OptionalSteps withRingBufferSize(int ringBufferSize);
-    
-   ```
- 
-  * Producer type. Default is [ProducerType.MULTI](https://lmax-exchange.github.io/disruptor/docs/com/lmax/disruptor/dsl/ProducerType.html#MULTI)
+ ```java
+  public OptionalSteps withRingBufferSize(int ringBufferSize);
   
-   ```java
-    public OptionalSteps withProducerType(final ProducerType producerType);
-    
-   ```
+ ```
+ 
+* Producer type. Default is [ProducerType.MULTI](https://lmax-exchange.github.io/disruptor/docs/com/lmax/disruptor/dsl/ProducerType.html#MULTI)
+  
+ ```java
+  public OptionalSteps withProducerType(final ProducerType producerType);
+  
+ ```
  
   Keep in mind that changing the type from MULTI to SINGLE will improve writer instances performance slightly but will
   render them **non thread-safe**.
-  * Buffer consumer write strategy. Default is [SleepingWaitStrategy](https://lmax-exchange.github.io/disruptor/docs/com/lmax/disruptor/SleepingWaitStrategy.html)
+  
+* Buffer consumer write strategy. Default is [SleepingWaitStrategy](https://lmax-exchange.github.io/disruptor/docs/com/lmax/disruptor/SleepingWaitStrategy.html)
 
-   ```java
-    public OptionalSteps withWaitStrategy(final WaitStrategy waitStrategy);
-    
-   ```
+ ```java
+  public OptionalSteps withWaitStrategy(final WaitStrategy waitStrategy);
+  
+ ```
    
 Finally, the writer can be configured on how to roll the Avro files. By default, a time and size policy is used, similar to
 [SizeAndTimeBasedFNATP](http://logback.qos.ch/apidocs/ch/qos/logback/core/rolling/SizeAndTimeBasedFNATP.html) in the
