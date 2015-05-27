@@ -16,6 +16,7 @@ Add the following Maven dependency to your project:
     
 ## Overview
 The library provides the following:
+
 * Efficient, asynchronous serialization of Avro objects into disk.
 * Customizable rolling management of the generated files.
 
@@ -63,14 +64,14 @@ these have been called.
 
 The builder also contains optional steps to customize the Disruptor used:
 
-  * Ring buffer size. Default is 2048 entries:
+* Ring buffer size. Default is 2048 entries:
  
  ```java
   public OptionalSteps withRingBufferSize(int ringBufferSize);
   
  ```
  
-  * Producer type. Default is [ProducerType.MULTI](https://lmax-exchange.github.io/disruptor/docs/com/lmax/disruptor/dsl/ProducerType.html#MULTI)
+* Producer type. Default is [ProducerType.MULTI](https://lmax-exchange.github.io/disruptor/docs/com/lmax/disruptor/dsl/ProducerType.html#MULTI)
   
  ```java
   public OptionalSteps withProducerType(final ProducerType producerType);
@@ -79,7 +80,8 @@ The builder also contains optional steps to customize the Disruptor used:
  
   Keep in mind that changing the type from MULTI to SINGLE will improve writer instances performance slightly but will
   render them **non thread-safe**.
-  * Buffer consumer write strategy. Default is [SleepingWaitStrategy](https://lmax-exchange.github.io/disruptor/docs/com/lmax/disruptor/SleepingWaitStrategy.html)
+  
+* Buffer consumer write strategy. Default is [SleepingWaitStrategy](https://lmax-exchange.github.io/disruptor/docs/com/lmax/disruptor/SleepingWaitStrategy.html)
 
  ```java
   public OptionalSteps withWaitStrategy(final WaitStrategy waitStrategy);
