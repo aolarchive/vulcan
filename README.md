@@ -16,8 +16,8 @@ Add the following Maven dependency to your project:
     
 ## Overview
 The library provides the following:
-  * Efficient, asynchronous serialization of Avro objects into disk.
-  * Customizable rolling management of the generated files.
+* Efficient, asynchronous serialization of Avro objects into disk.
+* Customizable rolling management of the generated files.
 
 ## API
 The library contains a DisruptorAvroFileWriter interface with a single method *write* that writes a given Avro record to a file in disk.
