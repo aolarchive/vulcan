@@ -51,7 +51,7 @@ public class AvroEventConsumer implements EventHandler<AvroEvent>, LifecycleAwar
   }
   
   @Override
-  public void onEvent(final AvroEvent event, long _, boolean endOfBatch) throws Exception {
+  public void onEvent(final AvroEvent event, long sequence, boolean endOfBatch) throws Exception {
     final SpecificRecord avroRecord = event.getAvroRecord();
     avroFileWriter.append(avroRecord);
     applyRollingPolicy(avroRecord);
