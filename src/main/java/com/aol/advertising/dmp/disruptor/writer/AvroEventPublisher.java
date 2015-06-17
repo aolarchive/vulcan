@@ -31,7 +31,7 @@ public class AvroEventPublisher implements DisruptorAvroFileWriter, EventTransla
   }
 
   @Override
-  public void translateTo(final AvroEvent avroEvent, long _, final SpecificRecord avroRecord) {
+  public void translateTo(final AvroEvent avroEvent, long sequence, final SpecificRecord avroRecord) {
     avroEvent.setAvroRecord(avroRecord);
   }
 

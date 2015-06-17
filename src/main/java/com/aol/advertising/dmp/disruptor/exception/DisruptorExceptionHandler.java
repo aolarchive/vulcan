@@ -10,7 +10,7 @@ public class DisruptorExceptionHandler implements ExceptionHandler {
   private static final Logger log = LoggerFactory.getLogger(DisruptorExceptionHandler.class);
 
   @Override
-  public void handleEventException(final Throwable ex, long _, final Object event) {
+  public void handleEventException(final Throwable ex, long sequence, final Object event) {
     log.error("Error while handling event\n{}\ndue to", event, ex);
   }
 
