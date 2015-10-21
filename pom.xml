@@ -2,9 +2,9 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>com.aol.advertising.dmp</groupId>
+  <groupId>com.aol.advertising.vulcan</groupId>
   <artifactId>disruptor_avro_writer</artifactId>
-  <version>2.4.1</version>
+  <version>1.0.0</version>
   <description>Disruptor-based Avro file writer</description>
   <packaging>jar</packaging>
 
@@ -28,6 +28,15 @@
   </distributionManagement>
 
   <build>
+    <resources>
+      <resource>
+        <directory>${project.basedir}</directory>
+        <targetPath>META-INF</targetPath>
+        <includes>
+          <include>LICENSE.txt</include>
+        </includes>
+      </resource>
+    </resources>
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>

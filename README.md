@@ -1,5 +1,5 @@
-# Disruptor Avro Writer
-The Disruptor Avro Writer library is an AOL project that provides a specialized, asynchronous version of the Avro writer
+# Vulcan Disruptor Avro Writer
+The Vulcan Disruptor Avro Writer library is an AOL project that provides a specialized, asynchronous version of the Avro writer
 in [Apache's Java Avro library](http://avro.apache.org/docs/current/gettingstartedjava.html).
 
 By wrapping Apache's writer with an [LMAX Disruptor](https://lmax-exchange.github.io/disruptor/) front-end, our library
@@ -9,13 +9,13 @@ allows client code to write Avro objects to disk taking advantage of the high-th
 Add the following Maven dependency to your project:
 
     <dependency>
-      <groupId>com.aol.advertising.dmp</groupId>
+      <groupId>com.aol.advertising.vulcan</groupId>
       <artifactId>disruptor_avro_writer</artifactId>
-      <version>2.4.1</version>
+      <version>1.0.0</version>
     </dependency>
     
 ## Overview
-The library provides the following:
+Vulcan provides the following:
 
 * Efficient, asynchronous serialization of Avro objects into disk.
 * Customizable rolling management of the generated files.
