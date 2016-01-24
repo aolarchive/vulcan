@@ -1,7 +1,11 @@
-package com.aol.advertising.dmp.disruptor.api.builder.steps;
+package com.aol.advertising.vulcan.api.builder.steps;
 
 import org.apache.avro.Schema;
 
+/**
+ * @author Jaime Nuche
+ *
+ */
 public interface AvroSchemaStep {
 
   /**
@@ -12,6 +16,6 @@ public interface AvroSchemaStep {
    * 
    * @throws IllegalArgumentException if the schema is null
    */
-  OptionalSteps thatWritesRecordsOf(final Schema avroSchema);
+  OptionalSteps thatWritesRecordsOf(Schema avroSchema);
 
 }

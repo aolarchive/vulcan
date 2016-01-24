@@ -1,13 +1,17 @@
-package com.aol.advertising.dmp.disruptor.api.builder.steps;
+package com.aol.advertising.vulcan.api.builder.steps;
 
-import com.aol.advertising.dmp.disruptor.api.DisruptorAvroFileWriter;
-import com.aol.advertising.dmp.disruptor.api.rolling.RollingPolicy;
-import com.aol.advertising.dmp.disruptor.rolling.TimeAndSizeBasedRollingPolicyConfig;
-import com.aol.advertising.dmp.disruptor.rolling.TimeAndSizeBasedRollingPolicy;
+import com.aol.advertising.vulcan.api.AvroWriter;
+import com.aol.advertising.vulcan.api.rolling.RollingPolicy;
+import com.aol.advertising.vulcan.rolling.TimeAndSizeBasedRollingPolicy;
+import com.aol.advertising.vulcan.rolling.TimeAndSizeBasedRollingPolicyConfig;
 import com.lmax.disruptor.SleepingWaitStrategy;
 import com.lmax.disruptor.WaitStrategy;
 import com.lmax.disruptor.dsl.ProducerType;
 
+/**
+ * @author Jaime Nuche
+ *
+ */
 public interface OptionalSteps {
 
   /**
@@ -26,7 +30,7 @@ public interface OptionalSteps {
    * <p>
    * Default is {@link ProducerType#MULTI}
    */
-  OptionalSteps withProducerType(final ProducerType producerType);
+  OptionalSteps withProducerType(ProducerType producerType);
 
   /**
    * Configures the Avro writer with the waiting strategy {@code waitStrategy}. The waiting strategy
@@ -35,23 +39,23 @@ public interface OptionalSteps {
    * <p>
    * Default is {@link SleepingWaitStrategy}
    */
-  OptionalSteps withWaitStrategy(final WaitStrategy waitStrategy);
+  OptionalSteps withWaitStrategy(WaitStrategy waitStrategy);
 
   /**
    * Rolling policy for the destination Avro file
    * <p>
    * Default is {@link TimeAndSizeBasedRollingPolicy} with a maximum file size of 50MB
    */
-  OptionalSteps withRollingPolicy(final RollingPolicy rollingPolicy);
+  OptionalSteps withRollingPolicy(RollingPolicy rollingPolicy);
 
   /**
    * Configures the default rolling policy with {@code configuration}
    */
-  OptionalSteps withDefaultRollingPolicyConfiguration(final TimeAndSizeBasedRollingPolicyConfig configuration);
+  OptionalSteps withDefaultRollingPolicyConfiguration(TimeAndSizeBasedRollingPolicyConfig configuration);
 
   /**
-   * Finish configuration and create a new {@link DisruptorAvroFileWriter} instance
+   * Finish configuration and create a new {@link AvroWriter} instance
    */
-  DisruptorAvroFileWriter createNewWriter();
+  AvroWriter createNewWriter();
 
 }

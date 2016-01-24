@@ -1,4 +1,4 @@
-package com.aol.advertising.dmp.disruptor.ringbuffer;
+package com.aol.advertising.vulcan.ringbuffer;
 
 import org.apache.avro.specific.SpecificRecord;
 
@@ -10,8 +10,7 @@ public class AvroEvent {
     return avroRecord;
   }
 
-  public void setAvroRecord(final SpecificRecord avroRecord) {
+  public void setAvroRecord(SpecificRecord avroRecord) {
     this.avroRecord = avroRecord;
   }
-
 }

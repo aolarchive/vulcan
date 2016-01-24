@@ -1,3 +1,3 @@
-package com.aol.advertising.dmp.disruptor.api.builder.steps;
+package com.aol.advertising.vulcan.api.builder.steps;
 
 public interface Steps extends MandatorySteps, OptionalSteps {}

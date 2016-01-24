@@ -1,8 +1,8 @@
-package com.aol.advertising.dmp.disruptor.rolling;
+package com.aol.advertising.vulcan.rolling;
 
 import org.joda.time.DateTime;
 
-class TimeBasedRollingCondition {
+class TimeBasedRollingCondition implements RollingCondition {
 
   private DateTime lastRolloverDate;
 
@@ -10,12 +10,13 @@ class TimeBasedRollingCondition {
     lastRolloverDate = DateTime.now();
   }
 
-  boolean lastRolloverHappenedBeforeToday() {
+  @Override
+  public boolean shouldRollover() {
     return lastRolloverDate.isBefore(new DateTime().withTimeAtStartOfDay());
   }
 
-  void signalRollover() {
+  @Override
+  public void signalRollover() {
     lastRolloverDate = DateTime.now();
   }
-
 }

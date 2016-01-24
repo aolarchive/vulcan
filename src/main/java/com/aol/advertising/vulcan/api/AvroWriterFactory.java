@@ -1,21 +1,24 @@
-package com.aol.advertising.dmp.disruptor.api;
+package com.aol.advertising.vulcan.api;
 
 import org.apache.avro.Schema;
 
-import com.aol.advertising.dmp.disruptor.api.builder.steps.OptionalSteps;
-import com.aol.advertising.dmp.disruptor.api.rolling.RollingPolicy;
-import com.aol.advertising.dmp.disruptor.rolling.TimeAndSizeBasedRollingPolicyConfig;
+import com.aol.advertising.vulcan.api.builder.steps.OptionalSteps;
+import com.aol.advertising.vulcan.api.rolling.RollingPolicy;
+import com.aol.advertising.vulcan.rolling.TimeAndSizeBasedRollingPolicyConfig;
 import com.lmax.disruptor.WaitStrategy;
 import com.lmax.disruptor.dsl.ProducerType;
 
 /**
- * Factory API to create new instances of {@link DisruptorAvroFileWriter}. This API is suitable for
- * applications with dependency injection and declarative configuration styles such as Spring's
- * XML-based configuration.
+ * Factory API to create new instances of {@link AvroWriter}. This API is suitable for applications
+ * with dependency injection and declarative configuration styles such as Spring's XML-based
+ * configuration.
+ * 
+ * @author Jaime Nuche
+ *
  */
-public class DisruptorAvroFileWriterFactory {
+public class AvroWriterFactory {
 
-  private String avroFileName;
+  private String avroFilename;
   private Schema avroSchema;
   private int ringBufferSize;
   private ProducerType producerType;
@@ -23,10 +26,10 @@ public class DisruptorAvroFileWriterFactory {
   private RollingPolicy rollingPolicy;
   private TimeAndSizeBasedRollingPolicyConfig defaultRollingPolicyConfiguration;
   
-  public DisruptorAvroFileWriter createNewWriter() {
-    final OptionalSteps writerBuilder = DisruptorAvroFileWriterBuilder.startCreatingANewWriter()
-                                                                      .thatWritesTo(avroFileName)
-                                                                      .thatWritesRecordsOf(avroSchema);
+  public AvroWriter createNewWriter() {
+    OptionalSteps writerBuilder = AvroWriterBuilder.startCreatingANewWriter()
+                                                   .thatWritesTo(avroFilename)
+                                                   .thatWritesRecordsOf(avroSchema);
     if (ringBufferSize > 0) {
       writerBuilder.withRingBufferSize(ringBufferSize);
     }
@@ -46,11 +49,11 @@ public class DisruptorAvroFileWriterFactory {
   }
 
 
-  public void setAvroFileName(final String avroFileName) {
-    this.avroFileName = avroFileName;
+  public void setAvroFilename(String avroFilename) {
+    this.avroFilename = avroFilename;
   }
 
-  public void setAvroSchema(final Schema avroSchema) {
+  public void setAvroSchema(Schema avroSchema) {
     this.avroSchema = avroSchema;
   }
 
@@ -58,11 +61,11 @@ public class DisruptorAvroFileWriterFactory {
     this.ringBufferSize = ringBufferSize;
   }
 
-  public void setProducerType(final ProducerType producerType) {
+  public void setProducerType(ProducerType producerType) {
     this.producerType = producerType;
   }
 
-  public void setWaitStrategy(final WaitStrategy waitStrategy) {
+  public void setWaitStrategy(WaitStrategy waitStrategy) {
     this.waitStrategy = waitStrategy;
   }
 
@@ -70,7 +73,7 @@ public class DisruptorAvroFileWriterFactory {
     this.defaultRollingPolicyConfiguration = configuration;
   }
 
-  public void setRollingPolicy(final RollingPolicy rollingPolicy) {
+  public void setRollingPolicy(RollingPolicy rollingPolicy) {
     this.rollingPolicy = rollingPolicy;
   }
 }

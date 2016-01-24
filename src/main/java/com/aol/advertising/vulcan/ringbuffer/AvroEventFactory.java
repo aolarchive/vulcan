@@ -1,4 +1,4 @@
-package com.aol.advertising.dmp.disruptor.ringbuffer;
+package com.aol.advertising.vulcan.ringbuffer;
 
 import com.lmax.disruptor.EventFactory;
 
