@@ -1,4 +1,4 @@
-package com.aol.advertising.dmp.disruptor.rolling;
+package com.aol.advertising.vulcan.rolling;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -16,7 +16,8 @@ import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.powermock.reflect.Whitebox;
 
-import com.aol.advertising.dmp.disruptor.ConfiguredUnitTest;
+import com.aol.advertising.vulcan.disruptor.ConfiguredUnitTest;
+import com.aol.advertising.vulcan.rolling.TimeBasedRollingCondition;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({DateTime.class, TimeBasedRollingCondition.class})
@@ -56,7 +57,7 @@ public class TimeBasedRollingConditionTest extends ConfiguredUnitTest {
   public void whenLastRollHappenedBeforeToday_thenRolloverShouldHappen() {
     givenLastRollHappenedBeforeToday();
 
-    final boolean rolloverShouldHappen = timeBasedRollingConditionUnderTest.lastRolloverHappenedBeforeToday();
+    boolean rolloverShouldHappen = timeBasedRollingConditionUnderTest.shouldRollover();
 
     assertThat(rolloverShouldHappen, is(equalTo(true)));
   }

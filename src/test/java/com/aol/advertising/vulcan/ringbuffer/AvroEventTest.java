@@ -1,4 +1,4 @@
-package com.aol.advertising.dmp.disruptor.ringbuffer;
+package com.aol.advertising.vulcan.ringbuffer;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.sameInstance;
@@ -8,6 +8,8 @@ import org.apache.avro.specific.SpecificRecord;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
+
+import com.aol.advertising.vulcan.ringbuffer.AvroEvent;
 
 public class AvroEventTest {
 
@@ -29,7 +31,7 @@ public class AvroEventTest {
 
   @Test
   public void whenTheContainedAvroRecordIsSet_thenTheRecordAssociatedToThisBufferSlotIsUpdated() {
-    final SpecificRecord newRecordMock = mock(SpecificRecord.class);
+    SpecificRecord newRecordMock = mock(SpecificRecord.class);
     avroEventUnderTest.setAvroRecord(newRecordMock);
     assertThat(avroEventUnderTest.getAvroRecord(), sameInstance(newRecordMock));
   }

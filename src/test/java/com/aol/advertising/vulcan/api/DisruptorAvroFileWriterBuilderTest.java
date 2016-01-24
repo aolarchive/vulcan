@@ -1,4 +1,4 @@
-package com.aol.advertising.dmp.disruptor.api;
+package com.aol.advertising.vulcan.api;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
@@ -27,17 +27,18 @@ import org.mockito.Spy;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
-import com.aol.advertising.dmp.disruptor.ConfiguredUnitTest;
-import com.aol.advertising.dmp.disruptor.api.builder.steps.AvroFileNameStep;
-import com.aol.advertising.dmp.disruptor.api.builder.steps.OptionalSteps;
-import com.aol.advertising.dmp.disruptor.api.rolling.RollingPolicy;
-import com.aol.advertising.dmp.disruptor.exception.DisruptorExceptionHandler;
-import com.aol.advertising.dmp.disruptor.ringbuffer.AvroEvent;
-import com.aol.advertising.dmp.disruptor.ringbuffer.AvroEventFactory;
-import com.aol.advertising.dmp.disruptor.rolling.TimeAndSizeBasedRollingPolicy;
-import com.aol.advertising.dmp.disruptor.rolling.TimeAndSizeBasedRollingPolicyConfig;
-import com.aol.advertising.dmp.disruptor.writer.AvroEventConsumer;
-import com.aol.advertising.dmp.disruptor.writer.AvroEventPublisher;
+import com.aol.advertising.vulcan.api.AvroWriterBuilder;
+import com.aol.advertising.vulcan.api.builder.steps.AvroFilenameStep;
+import com.aol.advertising.vulcan.api.builder.steps.OptionalSteps;
+import com.aol.advertising.vulcan.api.rolling.RollingPolicy;
+import com.aol.advertising.vulcan.disruptor.ConfiguredUnitTest;
+import com.aol.advertising.vulcan.exception.DisruptorExceptionHandler;
+import com.aol.advertising.vulcan.ringbuffer.AvroEvent;
+import com.aol.advertising.vulcan.ringbuffer.AvroEventFactory;
+import com.aol.advertising.vulcan.rolling.TimeAndSizeBasedRollingPolicy;
+import com.aol.advertising.vulcan.rolling.TimeAndSizeBasedRollingPolicyConfig;
+import com.aol.advertising.vulcan.writer.AvroEventConsumer;
+import com.aol.advertising.vulcan.writer.AvroEventPublisher;
 import com.lmax.disruptor.SleepingWaitStrategy;
 import com.lmax.disruptor.WaitStrategy;
 import com.lmax.disruptor.dsl.Disruptor;
@@ -46,7 +47,7 @@ import com.lmax.disruptor.dsl.ProducerType;
 // @formatter:off
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({AvroEventPublisher.class, AvroEventConsumer.class, TimeAndSizeBasedRollingPolicy.class,
-                 Disruptor.class, ProducerType.class, Files.class, DisruptorAvroFileWriterBuilder.class,
+                 Disruptor.class, ProducerType.class, Files.class, AvroWriterBuilder.class,
                  Paths.class})
 // @formatter:on
 public class DisruptorAvroFileWriterBuilderTest extends ConfiguredUnitTest {
@@ -55,10 +56,10 @@ public class DisruptorAvroFileWriterBuilderTest extends ConfiguredUnitTest {
   private static final TimeAndSizeBasedRollingPolicyConfig ROLLING_POLICY_CONFIGURATION =
       new TimeAndSizeBasedRollingPolicyConfig().withFileRollingSizeOf(345);
 
-  private AvroFileNameStep disruptorAvroFileWriterBuilderUnderTest;
+  private AvroFilenameStep disruptorAvroFileWriterBuilderUnderTest;
 
   @Spy
-  private AvroFileNameStep spyOnDisruptorAvroFileWriterBuilder = DisruptorAvroFileWriterBuilder.startCreatingANewWriter();
+  private AvroFilenameStep spyOnDisruptorAvroFileWriterBuilder = AvroWriterBuilder.startCreatingANewWriter();
   @Mock
   private AvroEventPublisher avroEventPublisherMock;
   @Mock
@@ -91,7 +92,7 @@ public class DisruptorAvroFileWriterBuilderTest extends ConfiguredUnitTest {
     initMocks();
     wireUpMocks();
 
-    disruptorAvroFileWriterBuilderUnderTest = DisruptorAvroFileWriterBuilder.startCreatingANewWriter();
+    disruptorAvroFileWriterBuilderUnderTest = AvroWriterBuilder.startCreatingANewWriter();
   }
   
   private void initMocks() throws Exception {
@@ -223,7 +224,7 @@ public class DisruptorAvroFileWriterBuilderTest extends ConfiguredUnitTest {
   
   @Test
   public void whenNoOptionalStepsAreCalled_thenDefaultsAreUsedToBuildTheWriter() throws Exception {
-    final OptionalSteps disruptorAvroFileWriterBuilderUnderTest = givenABuilderWithMandatoryStepsConfigured();
+    OptionalSteps disruptorAvroFileWriterBuilderUnderTest = givenABuilderWithMandatoryStepsConfigured();
 
     disruptorAvroFileWriterBuilderUnderTest.createNewWriter();
 
@@ -232,7 +233,7 @@ public class DisruptorAvroFileWriterBuilderTest extends ConfiguredUnitTest {
   
   @Test
   public void whenTheRingBufferSizeIsConfigured_thenItIsUsedToBuildTheWriter() throws Exception {
-    final OptionalSteps disruptorAvroFileWriterBuilderUnderTest = givenABuilderWithMandatoryStepsConfigured();
+    OptionalSteps disruptorAvroFileWriterBuilderUnderTest = givenABuilderWithMandatoryStepsConfigured();
     
     disruptorAvroFileWriterBuilderUnderTest.withRingBufferSize(Integer.MAX_VALUE).createNewWriter();
 
@@ -241,7 +242,7 @@ public class DisruptorAvroFileWriterBuilderTest extends ConfiguredUnitTest {
 
   @Test
   public void whenTheProducerTypeIsConfigured_thenItIsUsedToBuildTheWriter() throws Exception {
-    final OptionalSteps disruptorAvroFileWriterBuilderUnderTest = givenABuilderWithMandatoryStepsConfigured();
+    OptionalSteps disruptorAvroFileWriterBuilderUnderTest = givenABuilderWithMandatoryStepsConfigured();
     
     disruptorAvroFileWriterBuilderUnderTest.withProducerType(producerTypeMock).createNewWriter();
 
@@ -250,8 +251,7 @@ public class DisruptorAvroFileWriterBuilderTest extends ConfiguredUnitTest {
   
   @Test
   public void whenTheWaitStrategyIsConfigured_thenItIsUsedToBuildTheWriter() throws Exception {
-    final OptionalSteps disruptorAvroFileWriterBuilderUnderTest =
-        givenABuilderWithMandatoryStepsConfigured();
+    OptionalSteps disruptorAvroFileWriterBuilderUnderTest = givenABuilderWithMandatoryStepsConfigured();
 
     disruptorAvroFileWriterBuilderUnderTest.withWaitStrategy(waitStrategyMock).createNewWriter();
 
@@ -260,7 +260,7 @@ public class DisruptorAvroFileWriterBuilderTest extends ConfiguredUnitTest {
 
   @Test
   public void whenTheRollingPolicyIsConfigured_thenItIsUsedToBuildTheWriter() throws Exception {
-    final OptionalSteps disruptorAvroFileWriterBuilderUnderTest = givenABuilderWithMandatoryStepsConfigured();
+    OptionalSteps disruptorAvroFileWriterBuilderUnderTest = givenABuilderWithMandatoryStepsConfigured();
     
     disruptorAvroFileWriterBuilderUnderTest.withRollingPolicy(rollingPolicyMock).createNewWriter();
 
@@ -269,7 +269,7 @@ public class DisruptorAvroFileWriterBuilderTest extends ConfiguredUnitTest {
   
   @Test
   public void whenAConfigurationForTheDefaultRollingPolicyIsSpecified_thenTheValueIsUsedWhenBuildingTheWriter() throws Exception {
-    final OptionalSteps disruptorAvroFileWriterBuilderUnderTest = givenABuilderWithMandatoryStepsConfigured();
+    OptionalSteps disruptorAvroFileWriterBuilderUnderTest = givenABuilderWithMandatoryStepsConfigured();
     
     disruptorAvroFileWriterBuilderUnderTest.withDefaultRollingPolicyConfiguration(
         ROLLING_POLICY_CONFIGURATION).createNewWriter();
@@ -279,16 +279,16 @@ public class DisruptorAvroFileWriterBuilderTest extends ConfiguredUnitTest {
   
   @Test
   public void whenTheWriterIsBuilt_thenTheSpecifiedDestinationAvroFileIsRegisteredWithTheRollingPolicy() throws Exception {
-    final OptionalSteps disruptorAvroFileWriterBuilderUnderTest = givenABuilderWithMandatoryStepsConfigured();
+    OptionalSteps disruptorAvroFileWriterBuilderUnderTest = givenABuilderWithMandatoryStepsConfigured();
     
     disruptorAvroFileWriterBuilderUnderTest.createNewWriter();
     
-    verify(timeAndSizeBasedRollingPolicyMock).registerAvroFileName(avroFileNameMock);
+    verify(timeAndSizeBasedRollingPolicyMock).registerAvroFilename(avroFileNameMock);
   }
   
   @Test
   public void whenTheWriterIsBuilt_thenExceptionsWithinDisruptorAreHandledWithADisruptorExceptionHandler() throws Exception {
-    final OptionalSteps disruptorAvroFileWriterBuilderUnderTest = givenABuilderWithMandatoryStepsConfigured();
+    OptionalSteps disruptorAvroFileWriterBuilderUnderTest = givenABuilderWithMandatoryStepsConfigured();
     
     disruptorAvroFileWriterBuilderUnderTest.createNewWriter();
     
@@ -297,7 +297,7 @@ public class DisruptorAvroFileWriterBuilderTest extends ConfiguredUnitTest {
   
   @Test
   public void whenTheWriterIsBuilt_thenTheEventsConsumerExecutorIsRegisteredForShutdown() throws Exception {
-    final OptionalSteps disruptorAvroFileWriterBuilderUnderTest = givenABuilderWithMandatoryStepsConfigured();
+    OptionalSteps disruptorAvroFileWriterBuilderUnderTest = givenABuilderWithMandatoryStepsConfigured();
     
     disruptorAvroFileWriterBuilderUnderTest.createNewWriter();
     
