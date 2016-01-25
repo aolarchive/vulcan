@@ -10,7 +10,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 
-import com.aol.advertising.vulcan.disruptor.ConfiguredUnitTest;
+import com.aol.advertising.vulcan.ConfiguredUnitTest;
 import com.aol.advertising.vulcan.ringbuffer.AvroEvent;
 import com.aol.advertising.vulcan.writer.AvroEventPublisher;
 import com.lmax.disruptor.dsl.Disruptor;

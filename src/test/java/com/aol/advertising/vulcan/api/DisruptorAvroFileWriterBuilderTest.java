@@ -27,11 +27,11 @@ import org.mockito.Spy;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
+import com.aol.advertising.vulcan.ConfiguredUnitTest;
 import com.aol.advertising.vulcan.api.AvroWriterBuilder;
 import com.aol.advertising.vulcan.api.builder.steps.AvroFilenameStep;
 import com.aol.advertising.vulcan.api.builder.steps.OptionalSteps;
 import com.aol.advertising.vulcan.api.rolling.RollingPolicy;
-import com.aol.advertising.vulcan.disruptor.ConfiguredUnitTest;
 import com.aol.advertising.vulcan.exception.DisruptorExceptionHandler;
 import com.aol.advertising.vulcan.ringbuffer.AvroEvent;
 import com.aol.advertising.vulcan.ringbuffer.AvroEventFactory;

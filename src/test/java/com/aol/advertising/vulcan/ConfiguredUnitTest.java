@@ -1,4 +1,4 @@
-package com.aol.advertising.vulcan.disruptor;
+package com.aol.advertising.vulcan;
 
 import org.junit.Before;
 import org.mockito.MockitoAnnotations;

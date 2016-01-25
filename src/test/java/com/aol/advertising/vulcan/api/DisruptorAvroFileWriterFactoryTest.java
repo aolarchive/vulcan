@@ -12,10 +12,10 @@ import org.mockito.Mock;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
+import com.aol.advertising.vulcan.ConfiguredUnitTest;
 import com.aol.advertising.vulcan.api.AvroWriterBuilder;
 import com.aol.advertising.vulcan.api.AvroWriterFactory;
 import com.aol.advertising.vulcan.api.rolling.RollingPolicy;
-import com.aol.advertising.vulcan.disruptor.ConfiguredUnitTest;
 import com.aol.advertising.vulcan.rolling.TimeAndSizeBasedRollingPolicyConfig;
 import com.lmax.disruptor.WaitStrategy;
 import com.lmax.disruptor.dsl.ProducerType;

@@ -27,7 +27,7 @@ import org.junit.rules.TemporaryFolder;
 import org.mockito.Mock;
 import org.mockito.internal.util.reflection.Whitebox;
 
-import com.aol.advertising.vulcan.disruptor.ConfiguredUnitTest;
+import com.aol.advertising.vulcan.ConfiguredUnitTest;
 import com.aol.advertising.vulcan.exception.FileRollingException;
 import com.aol.advertising.vulcan.rolling.SizeBasedRollingCondition;
 import com.aol.advertising.vulcan.rolling.TimeAndSizeBasedRollingPolicy;

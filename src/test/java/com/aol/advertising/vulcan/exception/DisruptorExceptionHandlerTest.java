@@ -17,7 +17,7 @@ import org.powermock.modules.junit4.PowerMockRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.aol.advertising.vulcan.disruptor.ConfiguredUnitTest;
+import com.aol.advertising.vulcan.ConfiguredUnitTest;
 import com.aol.advertising.vulcan.exception.DisruptorExceptionHandler;
 
 @RunWith(PowerMockRunner.class)

@@ -7,7 +7,7 @@ import static org.hamcrest.Matchers.is;
 import org.junit.Test;
 import org.mockito.Mock;
 
-import com.aol.advertising.vulcan.disruptor.ConfiguredUnitTest;
+import com.aol.advertising.vulcan.ConfiguredUnitTest;
 import com.aol.advertising.vulcan.writer.ConsumerThreadFactory;
 
 public class ConsumerThreadFactoryTest extends ConfiguredUnitTest {

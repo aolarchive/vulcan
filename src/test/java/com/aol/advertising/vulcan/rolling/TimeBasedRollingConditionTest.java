@@ -16,7 +16,7 @@ import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.powermock.reflect.Whitebox;
 
-import com.aol.advertising.vulcan.disruptor.ConfiguredUnitTest;
+import com.aol.advertising.vulcan.ConfiguredUnitTest;
 import com.aol.advertising.vulcan.rolling.TimeBasedRollingCondition;
 
 @RunWith(PowerMockRunner.class)
