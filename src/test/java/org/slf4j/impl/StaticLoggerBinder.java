@@ -27,5 +27,4 @@ public class StaticLoggerBinder implements LoggerFactoryBinder {
   public String getLoggerFactoryClassStr() {
     return NOPLoggerFactory.class.getName();
   }
-
 }
