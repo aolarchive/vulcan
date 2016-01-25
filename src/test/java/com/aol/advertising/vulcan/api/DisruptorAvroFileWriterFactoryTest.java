@@ -1,4 +1,4 @@
-package com.aol.advertising.dmp.disruptor.api;
+package com.aol.advertising.vulcan.api;
 
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -12,14 +12,16 @@ import org.mockito.Mock;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
-import com.aol.advertising.dmp.disruptor.ConfiguredUnitTest;
-import com.aol.advertising.dmp.disruptor.api.rolling.RollingPolicy;
-import com.aol.advertising.dmp.disruptor.rolling.TimeAndSizeBasedRollingPolicyConfig;
+import com.aol.advertising.vulcan.ConfiguredUnitTest;
+import com.aol.advertising.vulcan.api.AvroWriterBuilder;
+import com.aol.advertising.vulcan.api.AvroWriterFactory;
+import com.aol.advertising.vulcan.api.rolling.RollingPolicy;
+import com.aol.advertising.vulcan.rolling.TimeAndSizeBasedRollingPolicyConfig;
 import com.lmax.disruptor.WaitStrategy;
 import com.lmax.disruptor.dsl.ProducerType;
 
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({ProducerType.class, DisruptorAvroFileWriterBuilder.class, DisruptorAvroFileWriterFactory.class})
+@PrepareForTest({ProducerType.class, AvroWriterBuilder.class, AvroWriterFactory.class})
 public class DisruptorAvroFileWriterFactoryTest extends ConfiguredUnitTest {
 
   private static final String AVRO_FILE_NAME = "Eufrasio";
@@ -28,7 +30,7 @@ public class DisruptorAvroFileWriterFactoryTest extends ConfiguredUnitTest {
       new TimeAndSizeBasedRollingPolicyConfig().withFileRollingSizeOf(345);
 
   @Mock
-  private DisruptorAvroFileWriterBuilder disruptorAvroFileWriterBuilderMock;
+  private AvroWriterBuilder disruptorAvroFileWriterBuilderMock;
   @Mock
   private Schema avroSchemaMock;
   @Mock
@@ -40,8 +42,8 @@ public class DisruptorAvroFileWriterFactoryTest extends ConfiguredUnitTest {
 
   @Before
   public void setUp() {
-    mockStatic(DisruptorAvroFileWriterBuilder.class);
-    when(DisruptorAvroFileWriterBuilder.startCreatingANewWriter()).thenReturn(disruptorAvroFileWriterBuilderMock);
+    mockStatic(AvroWriterBuilder.class);
+    when(AvroWriterBuilder.startCreatingANewWriter()).thenReturn(disruptorAvroFileWriterBuilderMock);
     when(disruptorAvroFileWriterBuilderMock.thatWritesTo(AVRO_FILE_NAME)).thenReturn(disruptorAvroFileWriterBuilderMock);
     when(disruptorAvroFileWriterBuilderMock.thatWritesRecordsOf(avroSchemaMock)).thenReturn(disruptorAvroFileWriterBuilderMock);
     when(disruptorAvroFileWriterBuilderMock.withRingBufferSize(BUFFER_SIZE)).thenReturn(disruptorAvroFileWriterBuilderMock);
@@ -54,7 +56,7 @@ public class DisruptorAvroFileWriterFactoryTest extends ConfiguredUnitTest {
 
   @Test
   public void whenANewWriterIsCreated_thenConstructionIsDelegatedToTheBuilder() {
-    final DisruptorAvroFileWriterFactory disruptorAvroFileWriterFactoryUnderTest = new DisruptorAvroFileWriterFactory();
+    final AvroWriterFactory disruptorAvroFileWriterFactoryUnderTest = new AvroWriterFactory();
     populateFactoryFields(disruptorAvroFileWriterFactoryUnderTest);
     
     disruptorAvroFileWriterFactoryUnderTest.createNewWriter();
@@ -62,8 +64,8 @@ public class DisruptorAvroFileWriterFactoryTest extends ConfiguredUnitTest {
     verifyDelegationUsedAllOfTheFactoryFields();
   }
 
-  private void populateFactoryFields(DisruptorAvroFileWriterFactory disruptorAvroFileWriterFactoryUnderTest) {
-    disruptorAvroFileWriterFactoryUnderTest.setAvroFileName(AVRO_FILE_NAME);
+  private void populateFactoryFields(AvroWriterFactory disruptorAvroFileWriterFactoryUnderTest) {
+    disruptorAvroFileWriterFactoryUnderTest.setAvroFilename(AVRO_FILE_NAME);
     disruptorAvroFileWriterFactoryUnderTest.setAvroSchema(avroSchemaMock);
     disruptorAvroFileWriterFactoryUnderTest.setRingBufferSize(BUFFER_SIZE);
     disruptorAvroFileWriterFactoryUnderTest.setProducerType(producerTypeMock);

@@ -1,4 +1,4 @@
-package com.aol.advertising.dmp.disruptor.rolling;
+package com.aol.advertising.vulcan.rolling;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -7,7 +7,7 @@ import static org.hamcrest.Matchers.is;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.aol.advertising.dmp.disruptor.rolling.TimeAndSizeBasedRollingPolicyConfig;
+import com.aol.advertising.vulcan.rolling.TimeAndSizeBasedRollingPolicyConfig;
 
 public class TimeAndSizeBasedRollingPolicyConfigTest {
 
@@ -32,7 +32,7 @@ public class TimeAndSizeBasedRollingPolicyConfigTest {
 
   @Test
   public void whenArgumentRestrictionsAreSatisfied_thenAConfigurationWithSpecifiedRollingSizeIsReturned() {
-    final TimeAndSizeBasedRollingPolicyConfig configuration =
+    TimeAndSizeBasedRollingPolicyConfig configuration =
         timeAndSizeBasedRollingPolicyConfigUnderTest.withFileRollingSizeOf(ROLLING_SIZE_IN_MB);
 
     assertThat(configuration.getRollingSizeInMb(), is(equalTo(ROLLING_SIZE_IN_MB)));

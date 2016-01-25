@@ -1,4 +1,4 @@
-package com.aol.advertising.dmp.disruptor.exception;
+package com.aol.advertising.vulcan.exception;
 
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.same;
@@ -17,7 +17,8 @@ import org.powermock.modules.junit4.PowerMockRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.aol.advertising.dmp.disruptor.ConfiguredUnitTest;
+import com.aol.advertising.vulcan.ConfiguredUnitTest;
+import com.aol.advertising.vulcan.exception.DisruptorExceptionHandler;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({LoggerFactory.class, DisruptorExceptionHandler.class})

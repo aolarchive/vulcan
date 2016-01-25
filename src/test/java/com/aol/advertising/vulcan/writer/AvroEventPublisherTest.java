@@ -1,4 +1,4 @@
-package com.aol.advertising.dmp.disruptor.writer;
+package com.aol.advertising.vulcan.writer;
 
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -10,8 +10,9 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 
-import com.aol.advertising.dmp.disruptor.ConfiguredUnitTest;
-import com.aol.advertising.dmp.disruptor.ringbuffer.AvroEvent;
+import com.aol.advertising.vulcan.ConfiguredUnitTest;
+import com.aol.advertising.vulcan.ringbuffer.AvroEvent;
+import com.aol.advertising.vulcan.writer.AvroEventPublisher;
 import com.lmax.disruptor.dsl.Disruptor;
 
 public class AvroEventPublisherTest extends ConfiguredUnitTest {
@@ -39,7 +40,7 @@ public class AvroEventPublisherTest extends ConfiguredUnitTest {
 
     thenTheRecordIsNotPublished();
   }
-  
+
   @Test
   public void whenAnAvroRecordIsWritten_andThePublisherHasBeenShutdown_thenTheRecordIsNotPublished() throws Exception {
     givenThePublisherHasBeenStarted();

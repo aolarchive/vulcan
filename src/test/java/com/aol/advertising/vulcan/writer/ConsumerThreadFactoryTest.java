@@ -1,4 +1,4 @@
-package com.aol.advertising.dmp.disruptor.writer;
+package com.aol.advertising.vulcan.writer;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -7,7 +7,8 @@ import static org.hamcrest.Matchers.is;
 import org.junit.Test;
 import org.mockito.Mock;
 
-import com.aol.advertising.dmp.disruptor.ConfiguredUnitTest;
+import com.aol.advertising.vulcan.ConfiguredUnitTest;
+import com.aol.advertising.vulcan.writer.ConsumerThreadFactory;
 
 public class ConsumerThreadFactoryTest extends ConfiguredUnitTest {
 
@@ -16,8 +17,8 @@ public class ConsumerThreadFactoryTest extends ConfiguredUnitTest {
 
   @Test
   public void whenAThreadIsRetrieved_thenItHasTheExpectedNameForTheDisruptorConsumerThread() {
-    final Thread consumerThread = new ConsumerThreadFactory().newThread(runnableMock);
+    Thread consumerThread = new ConsumerThreadFactory().newThread(runnableMock);
 
-    assertThat(consumerThread.getName(), is(equalTo("disruptor-avro-writer")));
+    assertThat(consumerThread.getName(), is(equalTo("vulcan-avro-writer")));
   }
 }
