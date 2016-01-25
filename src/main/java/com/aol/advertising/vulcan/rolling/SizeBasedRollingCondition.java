@@ -18,7 +18,7 @@ import com.aol.advertising.vulcan.rolling.RollingCondition.FileAwareRollingCondi
  */
 class SizeBasedRollingCondition implements FileAwareRollingCondition {
 
-  private static final int ONE_MB_IN_BYTES = 1_048_576;
+  private static final long ONE_MB_IN_BYTES = 1_048_576L;
 
   private final long rolloverTriggeringSizeInBytes;
 
