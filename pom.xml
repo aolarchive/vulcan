@@ -5,7 +5,9 @@
   <groupId>com.aol.advertising.vulcan</groupId>
   <artifactId>disruptor_avro_writer</artifactId>
   <version>1.1.0</version>
+  <name>Vulcan Writer</name>
   <description>Disruptor-based Avro file writer</description>
+  <url>https://github.com/aol/vulcan</url>
   <packaging>jar</packaging>
 
   <scm>
@@ -13,6 +15,21 @@
     <developerConnection>scm:git:git@github.com:aol/vulcan.git</developerConnection>
     <url>https://github.com/aol/vulcan</url>
   </scm>
+
+  <licenses>
+    <license>
+      <name>AOL flavor of BSD 3-Clause License</name>
+      <url>https://opensource.org/licenses/BSD-3-Clause</url>
+    </license>
+  </licenses>
+
+  <developers>
+    <developer>
+      <name>Jaime Nuche</name>
+      <email>jaime.nuche@gmail.com</email>
+      <url>https://github.com/fimbulwint</url>
+    </developer>
+  </developers>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
