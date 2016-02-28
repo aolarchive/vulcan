@@ -21,7 +21,7 @@ Vulcan provides the following:
 * Customizable rolling management of the generated files.
 
 ## API
-The library contains a DisruptorAvroFileWriter interface with a single method *write* that writes a given Avro record to a file in disk.
+The library contains a AvroWriter interface with a single method *write* that writes a given Avro record to a file in disk.
 
 ```java
 public interface AvroWriter extends AutoCloseable {
